@@ -62,10 +62,6 @@ public class XOAuth2Auth implements Auth{
 			
 			System.exit(ERR_AUTH_INFO_NOT_FOUND);
 		}
-		catch(IOException e){
-			System.err.println("Failed to read auth info file");
-			System.exit(SMTPClient.ERR_IO_ERROR);
-		}
 		
 	}
 	
