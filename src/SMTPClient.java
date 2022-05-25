@@ -1049,6 +1049,29 @@ public class SMTPClient{
 		return java.awt.GraphicsEnvironment.isHeadless();
 	}
 	
+	//Print a list of options to select from and return the chosen option
+	private static String selectOption(String... options){
+		int n = options.length;
+		
+		for(;;){
+			out.println("Select one of the following options: \n");
+			
+			for(int i = 1; i <= n; ++i)
+				stdOut.printf("[%d]:\t%s\n", i, options[i - 1]);
+			
+			String in = readLine(stdIn);
+			
+			try{
+				int i = Integer.valueOf(in);
+				
+				if(i >= 1 && i <= n){
+					return options[i - 1];
+				}
+			}catch(Exception e){}
+		}
+		
+	}
+	
 	//Container for server responses. Provides a static method to handle waiting for and reading responses.
 	private static class Response implements Iterable<String>{
 		private int respCode, respType;
