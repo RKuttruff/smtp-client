@@ -90,7 +90,7 @@ public class XOAuth2Auth implements Auth{
 	}
 	
 	@Override
-	public String authenticate(){
+	public String buildAuthString(){
 		return null;
 	}
 }
