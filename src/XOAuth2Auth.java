@@ -42,13 +42,41 @@ public class XOAuth2Auth implements Auth{
 				System.exit(ERR_AUTH_INFO_INCOMPLETE);
 			}
 		}
-		catch(IOException e){
-			System.err.println("Auth info file not found. See README for info");
+		catch(FileNotFoundException e){
+			System.err.println("Auth info file not found. Attempting to create a blank one. See README for info");
+			
+			try{
+				PrintStream ps = new PrintStream(STATE_FILE, "UTF-8");
+				
+				ps.println("### TOKENS ###");
+				ps.println();
+				ps.println("#OAUTH");
+				ps.println();
+				ps.println("CLIENT_ID=");
+				ps.println("CLIENT_SECRET=");
+				ps.println();
+				
+				ps.close();
+			}
+			catch(Exception e){}
+			
 			System.exit(ERR_AUTH_INFO_NOT_FOUND);
 		}
+		catch(IOException e){
+			System.err.println("Failed to read auth info file");
+			System.exit(SMTPClient.ERR_IO_ERROR);
+		}
+		
 	}
 	
 	private static void writeState(){}
+			ps.close();
+		}
+		catch(Exception e){
+			System.err.println("Failed to write auth info file");
+			System.exit(SMTPClient.ERR_IO_ERROR);
+		}
+	}
 	
 	@Override
 	public String authenticate(){
