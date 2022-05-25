@@ -69,7 +69,18 @@ public class XOAuth2Auth implements Auth{
 		
 	}
 	
-	private static void writeState(){}
+	private static void writeState(){
+		try{
+			PrintStream ps = new PrintStream(STATE_FILE, "UTF-8");
+				
+			ps.println("### TOKENS ###");
+			ps.println();
+			ps.println("#OAUTH");
+			ps.println();
+			
+			for(Map.Entry<String, String> e : state.entrySet())
+				ps.printf("%s=%s\n", e.getKey(), e.getValue());
+			
 			ps.close();
 		}
 		catch(Exception e){
