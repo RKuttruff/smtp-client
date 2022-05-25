@@ -32,15 +32,15 @@ public class SMTPClient{
 	private static final int SMTP_SERVER_PORT = 465;
 	
 	//Return codes
-	private static final int ERR_OK = 0x0;
-	private static final int ERR_NO_HOST = 0x1;
-	private static final int ERR_CONNECTION_FAILED = 0x2;
-	private static final int ERR_IO_ERROR = 0x3;
-	private static final int ERR_AUTH_FAILED = 0x4;
-	private static final int ERR_INVALID_OPT = 0x5;
-	private static final int ERR_BAD_COMMAND_LINE = 0x6;
-	private static final int ERR_NO_RECIPIENTS = 0x7;
-	private static final int ERR_NO_GUI = 0x8;
+	public static final int ERR_OK = 0x0;
+	public static final int ERR_NO_HOST = 0x1;
+	public static final int ERR_CONNECTION_FAILED = 0x2;
+	public static final int ERR_IO_ERROR = 0x3;
+	public static final int ERR_AUTH_FAILED = 0x4;
+	public static final int ERR_INVALID_OPT = 0x5;
+	public static final int ERR_BAD_COMMAND_LINE = 0x6;
+	public static final int ERR_NO_RECIPIENTS = 0x7;
+	public static final int ERR_NO_GUI = 0x8;
 	
 	//SMTP return code constants
 	//RFC 5321 4.2.2-3
