@@ -1205,6 +1205,8 @@ public class SMTPClient{
 		"  6  Bad command line",
 		"  7  No valid recipient addresses",
 		"  8  GUI requested but not supported by the runtime environment.",
+		"  9  Authenication info file (.auth) not found.",
+		"  10 Authenication info file (.auth) does not contain needed fields.",
 		"",
 		"  404  File not found. (for type=file)",
 		"",
