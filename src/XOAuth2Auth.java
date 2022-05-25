@@ -93,6 +93,8 @@ public class XOAuth2Auth implements Auth{
 	public String buildAuthString(String user){
 		final String FMT = "user=%s\001auth=Bearer %s\001\001";
 		
-		return null;
+		String authToken = null;
+		
+		return new String(Base64.getEncoder().encode(String.format(FMT, user, authToken).getBytes()));
 	}
 }
