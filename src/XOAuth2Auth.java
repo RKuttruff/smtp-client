@@ -58,7 +58,7 @@ public class XOAuth2Auth implements Auth{
 				
 				ps.close();
 			}
-			catch(Exception e){}
+			catch(Exception ee){}
 			
 			System.exit(ERR_AUTH_INFO_NOT_FOUND);
 		}
