@@ -31,7 +31,7 @@ public class XOAuth2Auth implements Auth{
 	}
 	
 	@Override
-	public String buildAuthString(String user){
+	public static String buildAuthString(String user){
 		final String FMT = "user=%s\001auth=Bearer %s\001\001";
 		
 		String authToken = null;
