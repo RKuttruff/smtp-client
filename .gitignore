@@ -28,4 +28,6 @@ hs_err_pid*
 #Authentication tokens
 .auth
 
-google-api-client-assembly-1.32.1-1.32.1/
+src/creds.data
+src/.env
+
