@@ -33,6 +33,7 @@ def getToken():
 	credentials = run_flow(flow, storage)
 	enable_stout(o_stdout, o_file)
 	
-	print ("access_token: %s" % (credentials.access_token))
+#	print ("access_token: %s" % (credentials.access_token))
+	print(credentials.access_token)
 	
 getToken()
