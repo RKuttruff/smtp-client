@@ -5,6 +5,10 @@ from oauth2client.client import OAuth2WebServerFlow
 from oauth2client.tools import run_flow
 from oauth2client.file import Storage
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 def disable_stout():
 	o_stdout = sys.stdout
 	o_file = open(os.devnull, "w")
@@ -16,8 +20,8 @@ def enable_stout(o_stdout, o_file):
 	sys.stdout = o_stdout
 
 def getToken():
-	CLIENT_ID = ''
-	CLIENT_SECRET = ''
+	CLIENT_ID = os.getenv('CLIENT_ID')
+	CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 	SCOPE = 'https://www.googleapis.com/auth/gmail.send'
 	REDIRECT_URL = 'http://127.0.0.1'
 	
