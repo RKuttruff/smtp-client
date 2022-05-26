@@ -41,7 +41,6 @@ public class SMTPClient{
 	public static final int ERR_BAD_COMMAND_LINE = 0x6;
 	public static final int ERR_NO_RECIPIENTS = 0x7;
 	public static final int ERR_NO_GUI = 0x8;
-	public static final int ERR_AUTH_SUBPROC_FAILED = 0xb;
 	
 	//SMTP return code constants
 	//RFC 5321 4.2.2-3
