@@ -3,7 +3,7 @@ import java.io.*;
 
 public class XOAuth2Auth implements Auth{
 	
-	private static boolean verifyEnvFile(){
+	private boolean verifyEnvFile(){
 		File envfile = new File(".env");
 		
 		if(!envfile.exists()){
@@ -31,18 +31,20 @@ public class XOAuth2Auth implements Auth{
 	}
 	
 	@Override
-	public static String buildAuthString(String user){
+	public byte[] buildAuthString(String user){
 		final String FMT = "user=%s\001auth=Bearer %s\001\001";
 		
 		String authToken = null;
 		
+		
+		
+		return Base64.getEncoder().encode(String.format(FMT, user, authToken).getBytes());
+	}
+	
+	public XOAuth2Auth(){
 		if(!verifyEnvFile()){
 			System.err.println("Auth info file is missing needed fields. See README for info");
 			System.exit(ERR_AUTH_INFO_INCOMPLETE);
 		}
-		
-		
-		
-		return new String(Base64.getEncoder().encode(String.format(FMT, user, authToken).getBytes()));
 	}
 }

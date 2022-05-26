@@ -41,6 +41,7 @@ public class SMTPClient{
 	public static final int ERR_BAD_COMMAND_LINE = 0x6;
 	public static final int ERR_NO_RECIPIENTS = 0x7;
 	public static final int ERR_NO_GUI = 0x8;
+	public static final int ERR_AUTH_SUBPROC_FAILED = 0xb;
 	
 	//SMTP return code constants
 	//RFC 5321 4.2.2-3
@@ -303,7 +304,12 @@ public class SMTPClient{
 	}
 	
 	private static void getXOAuth2Data(){
+		Auth auth = new XOAuth2Auth();
 		
+		if(uName == null)
+			getUser();
+		
+		authData = auth.buildAuthString(uName);
 	}
 	
 	//Gets username and password (if necessary) and encodes them in Base64 for PLAIN authentication
@@ -1303,6 +1309,7 @@ public class SMTPClient{
 		"  8  GUI requested but not supported by the runtime environment.",
 		"  9  Authenication info file (.auth) not found.",
 		"  10 Authenication info file (.auth) does not contain needed fields.",
+		"  11 Authenication subprocess failure.",
 		"",
 		"  404  File not found. (for type=file)",
 		"",
