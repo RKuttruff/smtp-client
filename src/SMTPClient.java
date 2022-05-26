@@ -108,6 +108,13 @@ public class SMTPClient{
 	
 	private static final Pattern COLON = Pattern.compile(":");
 	
+	private static final String[] AUTH_METHODS = {
+		"PLAIN",
+		"XOAUTH2"
+	};
+	
+	private static String authMethod;
+	
 	static{
 		System.setProperty("line.separator", CRLF);		//Since SMTP uses <CRLF>, set this as the default.
 		System.setProperty("java.net.preferIPv6Addresses", "true");
@@ -128,6 +135,8 @@ public class SMTPClient{
 		authData = null;
 		pass = null;
 		files = null;
+		
+		authMethod = AUTH_METHODS[1];
 		
 		stdIn = new BufferedReader(new InputStreamReader(System.in));
 		
@@ -293,8 +302,12 @@ public class SMTPClient{
 		return sb.toString();
 	}
 	
+	private static void getXOAuth2Data(){
+		
+	}
+	
 	//Gets username and password (if necessary) and encodes them in Base64 for PLAIN authentication
-	private static void buildAuthData(){
+	private static void buildPlainAuthData(){
 		if(uName == null)
 			getUser();
 		
@@ -344,12 +357,23 @@ public class SMTPClient{
 		Arrays.fill(auth, (byte)0);
 	}
 	
+	private static void buildAuthData(){
+		switch(authMethod){
+			case "PLAIN":
+				buildPlainAuthData();
+				break;
+			case "XOAUTH2":
+				getXOAuth2Data();
+				break;
+		}
+	}
+	
 	//Actually submit the authentication and return the response.
 	private static Response submitAuthentication(){
 		Response resp;
 		
 		try{
-			out.print("AUTH PLAIN ");
+			out.printf("AUTH %s ", authMethod);
 			out.flush();
 			
 			OutputStream os = socket.getOutputStream();
@@ -445,6 +469,7 @@ public class SMTPClient{
 		boolean userSet = false;		//-from option has been set
 		boolean rcptSet = false;		//-to option has been set
 		boolean passSet = false;		//-pass option has been set
+		boolean authSet = false;		//-auth option has been set
 		
 		for(String arg : args){
 			String originalArg = arg;	//Save the value of the argument (for error messages)
@@ -514,8 +539,49 @@ public class SMTPClient{
 					
 					passSet = true;
 				}
+				else if(arg.equalsIgnoreCase("auth")){
+					if(authSet){
+						stdErr.println("Repeated argument: " + originalArg);
+						System.exit(ERR_BAD_COMMAND_LINE);
+					}
+					
+					arg = splitKeyValue(arg);
+					
+					if(arg == null){
+						stdErr.println("Invalid argument: " + originalArg);
+						
+						System.exit(ERR_BAD_COMMAND_LINE);
+					}
+					
+					String am = arg;
+					
+					boolean valid = false;
+					
+					for(String m : AUTH_METHODS)
+						if(am.equals(m)){
+							valid = true;
+							break;
+						}
+						
+					if(!valid){
+						stdErr.println("Invalid auth method: " + am);
+						
+						System.exit(ERR_INVALID_OPT);
+					}
+					
+					authMethod = am;
+					authSet = true;
+				}
 				else if(arg.equalsIgnoreCase("help")){
 					help();
+				}
+				else if(arg.equalsIgnoreCase("list-auth")){
+					stdOut.println("Valid methods:\n");
+					
+					for(String m : AUTH_METHODS)
+						stdOut.println("\t" + m);
+					
+					System.exit(ERR_OK);
 				}
 				else if(arg.startsWith("type=")){
 					if(typeSet){
@@ -695,7 +761,7 @@ public class SMTPClient{
 			}
 			else if(autoAUTH){
 				buildAuthData();
-				logVerbose("AUTH PLAIN ****");
+				logVerbose(String.format("AUTH %s ****", authMethod));
 				resp = submitAuthentication();
 				resp.print();
 				autoAUTH = false;
@@ -703,6 +769,7 @@ public class SMTPClient{
 					stdErr.println("SMTP Error - " + resp.getResponseCode());
 					System.exit(resp.getResponseCode());
 				}
+
 				continue;
 			}
 			else
@@ -817,7 +884,7 @@ public class SMTPClient{
 		}
 		
 		buildAuthData();
-		logVerbose("AUTH PLAIN ****");
+		logVerbose(String.format("AUTH %s ****", authMethod));
 		resp = submitAuthentication();
 		logVerbose(resp);
 		
@@ -938,7 +1005,7 @@ public class SMTPClient{
 		}
 		
 		buildAuthData();
-		logVerbose("AUTH PLAIN ****");
+		logVerbose(String.format("AUTH %s ****", authMethod));
 		resp = submitAuthentication();
 		logVerbose(resp);
 		
@@ -1213,6 +1280,12 @@ public class SMTPClient{
 		"    Sets user's gmail password. If unset, user will be prompted at runtime. It is",
 		"    recommended that this not be used to avoid the password being stored in an",
 		"    immutable String object, rather than using a clearable character array.",
+		"",
+		"  -auth=<AUTH method>",
+		"    Sets the authentication method to use. Consult option -list-auth for valid options.",
+		"",
+		"  -list-auth",
+		"    Prints all implemented AUTH methods, then exits.",
 		"",
 		"  -help",
 		"    Prints this message, then exits.",
