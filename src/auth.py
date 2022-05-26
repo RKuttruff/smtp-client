@@ -22,7 +22,8 @@ def enable_stout(o_stdout, o_file):
 def getToken():
 	CLIENT_ID = os.getenv('CLIENT_ID')
 	CLIENT_SECRET = os.getenv('CLIENT_SECRET')
-	SCOPE = 'https://www.googleapis.com/auth/gmail.send'
+#	SCOPE = 'https://www.googleapis.com/auth/gmail.send'
+	SCOPE = 'https://mail.google.com/'
 	REDIRECT_URL = 'http://127.0.0.1'
 	
 	o_stdout, o_file = disable_stout()
