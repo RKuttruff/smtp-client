@@ -14,7 +14,7 @@ public class XOAuth2Auth implements Auth{
 		for(String dir : dirs){
 			File d = new File(dir);
 			
-			if(d.listFiles((a) -> return a.getName().contains("python3")).length > 0)
+			if(d.listFiles((a) -> {return a.getName().contains("python3");}).length > 0)
 				return INT_CMD;
 		}
 		
