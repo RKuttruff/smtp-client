@@ -41,6 +41,7 @@ public class SMTPClient{
 	public static final int ERR_BAD_COMMAND_LINE = 0x6;
 	public static final int ERR_NO_RECIPIENTS = 0x7;
 	public static final int ERR_NO_GUI = 0x8;
+	public static final int ERR_NO_VALID_AUTHS = 0xc;
 	
 	//SMTP return code constants
 	//RFC 5321 4.2.2-3
@@ -92,6 +93,8 @@ public class SMTPClient{
 	private static byte[] authData;
 	private static char[] pass;			//-pass=password
 	private static List<String> files;
+	private static String authMethod;
+	private static String[] validAuthMethods;
 	
 	//Client type data
 	private static int type;		//-type=(cli)|(gui)|(raw)|(file) ; If -type=file, files are added in cmdline after --, requires from to and pass to be set
@@ -112,8 +115,6 @@ public class SMTPClient{
 		"PLAIN",
 		"XOAUTH2"
 	};
-	
-	private static String authMethod;
 	
 	static{
 		System.setProperty("line.separator", CRLF);		//Since SMTP uses <CRLF>, set this as the default.
@@ -136,7 +137,8 @@ public class SMTPClient{
 		pass = null;
 		files = null;
 		
-		authMethod = AUTH_METHODS[1];
+		authMethod = null;
+		validAuthMethods = null;
 		
 		stdIn = new BufferedReader(new InputStreamReader(System.in));
 		
@@ -466,6 +468,60 @@ public class SMTPClient{
 			pass = System.console().readPassword("Enter gmail password: ");
 	}
 	
+	private static void getValidAuths(Response r){
+		String methods = null;
+		
+		for(String l : r)
+			if(l.contains("AUTH"))
+				methods = l.split("AUTH")[1].trim();
+			
+		Set<String> implemented = new HashSet<>(Arrays.asList(AUTH_METHODS));
+		Set<String> accepted = new HashSet<>(Arrays.asList(methods.split(" ")));
+		
+		implemented.retainAll(accepted);
+		
+		validAuthMethods = implemented.toArray(new String[implemented.size()]);
+		
+		if(validAuthMethods.length == 0){
+			System.err.println("No accepted AUTH methods by this server have been implemented");
+			System.exit(ERR_NO_VALID_AUTHS);
+		}
+		else if(validAuthMethods.length == 1)
+			authMethod = validAuthMethods[0];
+	}
+	
+	private static void getAuthMethod(){
+		if(pipe && headless()){
+			stdErr.println("Since stdin is used as an input, an alternate means of obtaining authentication information is needed (JOptionPane); however, the current environment does not support GUI.");
+			
+			if(verbose)
+				stdErr.println("(java.awt.GraphicsEnvironment.isHeadless() == true)");
+			
+			System.exit(ERR_NO_GUI);
+		}
+		else if(!pipe)
+			authMethod = selectOption("AUTH Method", validAuthMethods);
+		else{
+			int choice = JOptionPane.showOptionDialog(
+				null,
+				"Select a valid AUTH method",
+				"Select AUTH",
+				JOptionPane.DEFAULT_OPTION,
+				JOptionPane.QUESTION_MESSAGE,
+				null,
+				validAuthMethods,
+				validAuthMethods[0]
+			);
+			
+			if(choice == JOptionPane.CLOSED_OPTION){
+				System.err.println("No auth method chosen, closing");
+				System.exit(ERR_OK);
+			}
+			
+			authMethod = validAuthMethods[choice];
+		}
+	}
+	
 	//Parse the command line...
 	private static void splitCommandLine(String[] args){
 		boolean typeSet = false;		//-type option has been set
@@ -765,6 +821,11 @@ public class SMTPClient{
 				autoEHLO = false;
 			}
 			else if(autoAUTH){
+				getValidAuths(resp);
+		
+				if(authMethod == null)
+					getAuthMethod();
+				
 				buildAuthData();
 				logVerbose(String.format("AUTH %s ****", authMethod));
 				resp = submitAuthentication();
@@ -888,6 +949,11 @@ public class SMTPClient{
 			System.exit(resp.getResponseCode());
 		}
 		
+		getValidAuths(resp);
+		
+		if(authMethod == null)
+			getAuthMethod();
+		
 		buildAuthData();
 		logVerbose(String.format("AUTH %s ****", authMethod));
 		resp = submitAuthentication();
@@ -1009,6 +1075,11 @@ public class SMTPClient{
 			System.exit(resp.getResponseCode());
 		}
 		
+		getValidAuths(resp);
+		
+		if(authMethod == null)
+			getAuthMethod();
+		
 		buildAuthData();
 		logVerbose(String.format("AUTH %s ****", authMethod));
 		resp = submitAuthentication();
@@ -1122,11 +1193,11 @@ public class SMTPClient{
 	}
 	
 	//Print a list of options to select from and return the chosen option
-	private static String selectOption(String... options){
+	private static String selectOption(String what, String... options){
 		int n = options.length;
 		
 		for(;;){
-			out.println("Select one of the following options: \n");
+			out.println("Select one of the following options for: " + what + "\n");
 			
 			for(int i = 1; i <= n; ++i)
 				stdOut.printf("[%d]:\t%s\n", i, options[i - 1]);
@@ -1309,6 +1380,7 @@ public class SMTPClient{
 		"  9  Authenication info file (.auth) not found.",
 		"  10 Authenication info file (.auth) does not contain needed fields.",
 		"  11 Authenication subprocess failure.",
+		"  12 No valid authenication methods.",
 		"",
 		"  404  File not found. (for type=file)",
 		"",
