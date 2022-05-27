@@ -404,6 +404,7 @@ public class SMTPClient{
 		
 		if(resp.getResponseCodeType() == 5){
 			stdErr.println("Authentication failed!");
+			stdErr.println(resp);
 			System.exit(ERR_AUTH_FAILED);
 		}
 		
@@ -473,7 +474,7 @@ public class SMTPClient{
 		
 		for(String l : r)
 			if(l.contains("AUTH"))
-				methods = l.split("AUTH")[1].trim();
+				methods = l.split("AUTH", 2)[1].trim();
 			
 		Set<String> implemented = new HashSet<>(Arrays.asList(AUTH_METHODS));
 		Set<String> accepted = new HashSet<>(Arrays.asList(methods.split(" ")));
