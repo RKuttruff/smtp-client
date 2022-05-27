@@ -3,6 +3,13 @@ import java.io.*;
 
 public class XOAuth2Auth implements Auth{
 	
+	private static final String[] INT_CMD = {"python3", "auth.py"};
+	private static final String[] EXE_CMD = {"auth"};
+	
+	private static String[] getCmd(){
+		
+	}
+	
 	private boolean verifyEnvFile(){
 		File envfile = new File(".env");
 		
