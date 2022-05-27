@@ -31,4 +31,4 @@ hs_err_pid*
 src/creds.data
 src/.env
 
-src/auth.exe
+#src/auth.exe
