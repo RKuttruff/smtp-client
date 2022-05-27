@@ -27,3 +27,9 @@ hs_err_pid*
 
 #Authentication tokens
 .auth
+
+src/creds.data
+src/.env
+
+#src/auth.exe
+Test.java
