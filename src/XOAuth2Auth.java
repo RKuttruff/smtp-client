@@ -7,7 +7,18 @@ public class XOAuth2Auth implements Auth{
 	private static final String[] EXE_CMD = {"auth.exe"};
 	
 	private static String[] getCmd(){
+		String pathString = System.getenv("PATH");
 		
+		String[] dirs = pathString.split(System.getProperty("path.separator"));
+		
+		for(String dir : dirs){
+			File d = new File(dir);
+			
+			if(d.listFiles((a) -> return a.getName().contains("python3")).length > 0)
+				return INT_CMD;
+		}
+		
+		return EXE_CMD;
 	}
 	
 	private boolean verifyEnvFile(){
@@ -43,7 +54,7 @@ public class XOAuth2Auth implements Auth{
 		
 		String authToken = null;
 		
-		ProcessBuilder pb = new ProcessBuilder("python3", "auth.py").redirectError(ProcessBuilder.Redirect.INHERIT);
+		ProcessBuilder pb = new ProcessBuilder(getCmd()).redirectError(ProcessBuilder.Redirect.INHERIT);
 		
 		try{
 			Process p = pb.start();
