@@ -19,42 +19,47 @@ public class XOAuth2Auth implements Auth{
 	private static final String[] EXE_CMD = {"auth.exe"};
 	
 	private static String[] getCmd(){
-		String pathString = System.getenv("PATH");
+		try{
+			String pathString = System.getenv("PATH");
 		
-		String[] dirs = pathString.split(System.getProperty("path.separator"));
-		
-		for(String dir : dirs){
-			File d = new File(dir);
+			String[] dirs = pathString.split(System.getProperty("path.separator"));
 			
-			if(d.listFiles((a) -> {return a.getName().contains("python3");}).length > 0)
-				return INT_CMD;
-		}
-		
-		if(!(new File("auth.exe").exists() || new File("auth").exists())){
-			try{
-				File exe = new File("auth.exe");
+			for(String dir : dirs){
+				File d = new File(dir);
 				
-				exe.deleteOnExit();
-				
-				InputStream is = XOAuth2Auth.class.getResource("auth.exe").openStream();
-				OutputStream os = new FileOutputStream(new File("auth.exe"));
-				
-				byte[] buf = new byte[4096];
-				int len;
-				
-				while((len = is.read(buf)) != -1)
-					os.write(buf, 0, len);
-				
-				is.close();
-				os.close();
+				if(d.listFiles((a) -> {return a.getName().contains("python3");}).length > 0)
+					return INT_CMD;
 			}
-			catch(IOException e){
-				System.err.println("An IO error occurred trying to extract the auth module");
-				System.exit(SMTPClient.ERR_IO_ERROR);
+			
+			if(!(new File("auth.exe").exists() || new File("auth").exists())){
+				try{
+					File exe = new File("auth.exe");
+					
+					exe.deleteOnExit();
+					
+					InputStream is = XOAuth2Auth.class.getResource("auth.exe").openStream();
+					OutputStream os = new FileOutputStream(new File("auth.exe"));
+					
+					byte[] buf = new byte[4096];
+					int len;
+					
+					while((len = is.read(buf)) != -1)
+						os.write(buf, 0, len);
+					
+					is.close();
+					os.close();
+				}
+				catch(IOException e){
+					System.err.println("An IO error occurred trying to extract the auth module");
+					System.exit(SMTPClient.ERR_IO_ERROR);
+				}
 			}
+			
+			return EXE_CMD;
 		}
-		
-		return EXE_CMD;
+		catch(Exception e){
+			return EXE_CMD;
+		}
 	}
 	
 	private boolean verifyEnvFile(){
