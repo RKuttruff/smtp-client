@@ -600,7 +600,7 @@ public class SMTPClient{
 					
 					passSet = true;
 				}
-				else if(arg.equalsIgnoreCase("auth")){
+				else if(arg.equalsIgnoreCase("auth=")){
 					if(authSet){
 						stdErr.println("Repeated argument: " + originalArg);
 						System.exit(ERR_BAD_COMMAND_LINE);
