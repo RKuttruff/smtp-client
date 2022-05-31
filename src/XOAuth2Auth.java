@@ -13,11 +13,28 @@
 import java.util.*;
 import java.io.*;
 
+/**
+ * Class to handle XOAUTH2 SMTP authentication method. Sets up and executes a Python script ({@code auth.py}) as a subprocess, which returns an OAuth access token to the parent.
+ *
+ *  @author     Riley Kuttruff
+ *  @version    1.0
+ */
 public class XOAuth2Auth implements Auth{
     
+    /**Subprocess command for when a Python interpreter is available in the PATH.*/
     private static final String[] INT_CMD = {"python3", "auth.py"};
+    /**Subprocess command for when a Python interpreter is not available in the PATH.*/
     private static final String[] EXE_CMD = {"auth.exe"};
     
+    /**
+     * Determines the command to use for XOAUTH2 subprocess.
+     * <p>
+     * Scans through the PATH environment variable to see if a Python interpreter is present in the path. If one is found, it is used with {@code auth.py}. Otherwise, 
+     * a precompiled binary (<b>WINDOWS ONLY!!!</b>) is used. If it does not exist in the current directory, it will be extracted from the jar archive, executed, and 
+     * deleted on program exit.
+     * 
+     * @return And array to use with {@link ProcessBuilder} for the XOAUTH2 subprocess.
+     */
     private static String[] getCmd(){
         try{
             String pathString = System.getenv("PATH");
@@ -62,6 +79,13 @@ public class XOAuth2Auth implements Auth{
         
     }
     
+    /**
+     * Validates the OAuth environment file.
+     * <p>
+     * Checks the {@code .env} file containing needed fields for OAuth requests (Client ID, Client Secret) is present and contains the needed data.
+     * 
+     * @return {@code true} if the file exists and contains the needed data, {@code false} if the file exists and does not contain the needed data
+     */
     private boolean verifyEnvFile(){
         File envfile = new File(".env");
         
@@ -89,6 +113,13 @@ public class XOAuth2Auth implements Auth{
         return id && sec;
     }
     
+    /**
+     * Creates the argument to the AUTH XOAUTH2 command.
+     * <p>
+     * Executes the Python subprocess and processes the returned access token to return the base64 encoded argument to the AUTH command.
+     * 
+     * @return Argument to AUTH command
+     */
     @Override
     public byte[] buildAuthString(String user){
         final String FMT = "user=%s\001auth=Bearer %s\001\001";
@@ -128,6 +159,7 @@ public class XOAuth2Auth implements Auth{
         }
     }
     
+    /** Default constructor, just validates the {@code .env} file */
     public XOAuth2Auth(){
         if(!verifyEnvFile()){
             System.err.println("Auth info file is missing needed fields. See README for info");
