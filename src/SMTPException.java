@@ -10,6 +10,12 @@
 *
 */
 
+/**
+ * Base exception class for SMTP-related exceptions.
+ *
+ *  @author     Riley Kuttruff
+ *  @version    1.0
+ */
 public class SMTPException extends RuntimeException{
     public SMTPException(){
         this(null);
