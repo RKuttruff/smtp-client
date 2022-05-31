@@ -232,10 +232,12 @@ class GUIClient extends JFrame{
         return data;
     }
     
+	/**@hidden*/
     private static JPanel panel(LayoutManager lm){
         return new JPanel(lm);
     }
     
+	/**@hidden*/
     private static JPanel panel(){
         return new JPanel();
     }
@@ -253,6 +255,7 @@ class GUIClient extends JFrame{
     }
     
     //Only enable the provided JComponent if ALL JTextComponents has text in them. Used to disable the send button until there's the needed data.
+	/**@hidden*/
     private static class AllFilledListener implements DocumentListener{
         JTextComponent[] checklist;
         JComponent toEnable;

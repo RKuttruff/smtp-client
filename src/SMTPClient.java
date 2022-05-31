@@ -107,7 +107,6 @@ public class SMTPClient{
     private static final int TYPE_GUI = 3;
     private static final int TYPE_RAW_SMTP = 4;
     private static final int TYPE_DEFAULT = TYPE_RAW_SMTP;
-    //private static final int TYPE_DEFAULT = TYPE_GUI;
     
     private static final Pattern COLON = Pattern.compile(":");
     
@@ -237,10 +236,12 @@ public class SMTPClient{
     }
     
     //Formats printing of IP addresses
+    /**@hidden*/
     private static String inetAddressToHostString(InetAddress addr){
         return (addr instanceof Inet4Address) ? addr.getHostAddress() : "[" + shortenInet6Addr(addr.getHostAddress()) + "]";
     }
     
+    /**@hidden*/
     private static String shortenInet6Addr(String ip){
         if(ip == null)
             return ip;
@@ -726,6 +727,7 @@ public class SMTPClient{
     }
     
     //Convenience method to split -key=value arguments
+    /**@hidden*/
     private static String splitKeyValue(String kv){
         try{
             String v = kv.split("=", 2)[1];
@@ -745,6 +747,7 @@ public class SMTPClient{
         System.exit(ERR_OK);
     }
     
+    /**@hidden*/
     private static String readLine(BufferedReader reader){
         try{
             return reader.readLine();
@@ -755,12 +758,14 @@ public class SMTPClient{
     }
     
     //Verbose output only if -v set
+    /**@hidden*/
     private static void logVerbose(String str){
         if(verbose)
             stdOut.println(str);
     }
     
     //Verbose output only if -v set
+    /**@hidden*/
     private static void logVerbose(Object str){
         if(verbose)
             stdOut.println(str.toString());
@@ -888,6 +893,7 @@ public class SMTPClient{
     }
     
     //CLI client NON-implementation
+    /**@hidden*/
     private static void cliClient(){
         stdOut.println("CLI not implemented yet");
         System.exit(-1 /*ERR_NOT_IMPLEMENTED*/);
@@ -1189,6 +1195,7 @@ public class SMTPClient{
         logVerbose(resp);
     }
     
+    /**@hidden*/
     private static boolean headless(){
         return java.awt.GraphicsEnvironment.isHeadless();
     }
@@ -1309,14 +1316,17 @@ public class SMTPClient{
             return resp;
         }
         
+        /**@hidden*/
         private static boolean matches(CharSequence seq, Pattern p){
             return p.matcher(seq).matches();
         }
         
+        /**@hidden*/
         private static String[] split(Pattern p, CharSequence seq){
             return split(p, seq, 0);
         }
         
+        /**@hidden*/
         private static String[] split(Pattern p, CharSequence seq, int limit){
             return p.split(seq, limit);
         }
