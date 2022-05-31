@@ -1198,7 +1198,7 @@ public class SMTPClient{
         int n = options.length;
         
         for(;;){
-            out.println("Select one of the following options for: " + what + "\n");
+            stdOut.println("Select one of the following options for: " + what + "\n");
             
             for(int i = 1; i <= n; ++i)
                 stdOut.printf("[%d]:\t%s\n", i, options[i - 1]);
