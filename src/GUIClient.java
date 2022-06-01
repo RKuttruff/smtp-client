@@ -24,11 +24,14 @@ import javax.swing.text.JTextComponent;
 //The GUI
 /**
  * Implementation of the GUI client.
+ *
+ *  @author     Riley Kuttruff
+ *  @version    1.0
  */
 class GUIClient extends JFrame{
-	/**Holds session data for this client*/
+    /**Holds session data for this client*/
     private ClientData data;
-	/**@hidden*/
+    /**@hidden*/
     private GUIClient frm;
     
     /**@hidden*/
@@ -41,7 +44,7 @@ class GUIClient extends JFrame{
     //When the JOptionPane containing a JPasswordField is displayed, one of the buttons on the JOptionPane is focused by default.
     //I found this code online to set the focus to the JPasswordField (or whatever component into which this listener is installed)
     //in order to allow the user to immediately type thier password in and not have to click the field.
-	/**@hidden*/
+    /**@hidden*/
     static final HierarchyListener PASS_JOP_LISTENER = new HierarchyListener(){
         @Override
         public void hierarchyChanged(HierarchyEvent e){
@@ -51,13 +54,13 @@ class GUIClient extends JFrame{
     };
     
     /**
-	 * Constructor
-	 * <p>
-	 * Builds client window and displays it, storing session information into the argument object.
-	 * 
-	 * @param data {@link ClientData} object to store session data
-	 */
-	private GUIClient(ClientData data){
+     * Constructor
+     * <p>
+     * Builds client window and displays it, storing session information into the argument object.
+     * 
+     * @param data {@link ClientData} object to store session data
+     */
+    private GUIClient(ClientData data){
         super("SMTP Client");
         this.data = data;
         frm = this;
@@ -218,14 +221,14 @@ class GUIClient extends JFrame{
     
     //Displays the GUI client and blocks until it closes
     /**
-	 * Displays the GUI client.
-	 * <p>
-	 * Blocks until client exits before returning session data.
-	 * 
-	 * @param data {@link ClientData} object to store session data
-	 * @return data Session data stored in {@link ClientData} object
-	 */
-	public static ClientData getMessage(final ClientData data){
+     * Displays the GUI client.
+     * <p>
+     * Blocks until client exits before returning session data.
+     * 
+     * @param data {@link ClientData} object to store session data
+     * @return data Session data stored in {@link ClientData} object
+     */
+    public static ClientData getMessage(final ClientData data){
         SwingUtilities.invokeLater(() -> new GUIClient(data));
         
         FutureTask<Thread> future = new FutureTask<>(new Callable<Thread>(){
@@ -256,20 +259,20 @@ class GUIClient extends JFrame{
         return data;
     }
     
-	//JPanel convenience factory method w/ LayoutManager
-	/**@hidden*/
+    //JPanel convenience factory method w/ LayoutManager
+    /**@hidden*/
     private static JPanel panel(LayoutManager lm){
         return new JPanel(lm);
     }
     
-	//JPanel convenience factory method w/o LayoutManager
-	/**@hidden*/
+    //JPanel convenience factory method w/o LayoutManager
+    /**@hidden*/
     private static JPanel panel(){
         return new JPanel();
     }
     
     /**@hidden*/
-	private static String buildRecipientString(String[] rec){
+    private static String buildRecipientString(String[] rec){
         if(rec == null || rec.length == 0)
             return "";
         
@@ -282,7 +285,7 @@ class GUIClient extends JFrame{
     }
     
     //Only enable the provided JComponent if ALL JTextComponents has text in them. Used to disable the send button until there's the needed data.
-	/**@hidden*/
+    /**@hidden*/
     private static class AllFilledListener implements DocumentListener{
         JTextComponent[] checklist;
         JComponent toEnable;
@@ -328,32 +331,35 @@ class GUIClient extends JFrame{
         
     }
     
-	/**
-	 * Container class for important data used by the client.
-	 * <p>
-	 * Passes back to {@link SMTPClient} data such as username, recipients, message subject and message 
-	 * text.
-	 */
+    /**
+     * Container class for important data used by the client.
+     * <p>
+     * Passes back to {@link SMTPClient} data such as username, recipients, message subject and message 
+     * text.
+     *
+     *  @author     Riley Kuttruff
+     *  @version    1.0
+     */
     public static class ClientData{
         /**If the data contained is complete and ready to be passed to the SMTP server*/
-		private boolean done;
+        private boolean done;
         
-		/**Sender's username*/
+        /**Sender's username*/
         public String uName;
-		/**User password*/
+        /**User password*/
         public char[] pass;
-		/**Recipient's username(s)*/
+        /**Recipient's username(s)*/
         public String[] recipients;
         
-		/**Message subject*/
+        /**Message subject*/
         public String subject;
         
-		/**List of each line of message text*/
+        /**List of each line of message text*/
         public List<String> messageLines;
         
-		/**
-		 * Default constructor
-		 */
+        /**
+         * Default constructor
+         */
         public ClientData(){
             uName = null;
             pass = null;
@@ -366,9 +372,9 @@ class GUIClient extends JFrame{
             done = false;
         }
         
-		/**
-		 * Returns if the data contained is complete and ready to be passed to the SMTP server
-		 */
+        /**
+         * Returns if the data contained is complete and ready to be passed to the SMTP server
+         */
         public boolean isDone(){
             return done;
         }
