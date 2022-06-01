@@ -78,6 +78,6 @@ Prints verbose output.
 2. Create a file `.env` in the directory you intend to have the client.
 3. Edit the file to add the following information:
 <pre>
-   CLIENT_ID=<u>Your client ID</u>
-   CLIENT_SECRET=<u>Your client secret</u>
+   CLIENT_ID=Your client ID
+   CLIENT_SECRET=Your client secret
 </pre>
