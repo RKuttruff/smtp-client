@@ -1387,14 +1387,19 @@ public class SMTPClient{
         
     }
     
-    //Container for server responses. Provides a static method to handle waiting for and reading responses.
+    //
 	/**
-	 * 
+	 * Container for server responses. 
+	 * <p>
+	 * Provides a static method to handle waiting for and reading responses.
  	 */
     private static class Response implements Iterable<String>{
+        /**@hidden*/
         private int respCode, respType;
+        /**@hidden*/
         private List<String> respLines;
         
+        /**@hidden*/
         private static final Pattern RESP_NONFINAL, RESP_FINAL, SP;
         
         static{
@@ -1403,27 +1408,56 @@ public class SMTPClient{
             SP = Pattern.compile(" ");
         }
         
+		/**
+		 * Default constructor.
+		 */
         private Response(){
             respCode = respType = -1;
             respLines = new ArrayList<String>();
         }
         
+        /**
+		 * Returns the response code from the server.
+		 * 
+		 * @return Server's response code
+		 */
         public int getResponseCode(){
             return respCode;
         }
         
+        /**
+		 * Returns the type of this response's response code.
+		 * 
+		 * @return Server's response code type (First digit)
+		 */
         public int getResponseCodeType(){
             return respType;
         }
         
+        /**
+		 * Lines of the response text.
+		 * <p>
+		 * Returned as an unmodifiable list.
+		 * 
+		 * @return {@link java.util.List} object containing the response text line-by-line.
+		 * @see Collections##unmodifiableList(java.util.List)
+		 */
         public List<String> getResponseLines(){
             return Collections.unmodifiableList(respLines);
         }
         
+        /**
+		 * Print this response to standard output.
+		 */
         public void print(){
             stdOut.println(this);
         }
         
+        /**
+		 * Reconstructs the text of the server's response.
+		 * 
+		 * @return Response text
+		 */
         @Override
         public String toString(){
             StringBuilder sb = new StringBuilder();
@@ -1434,6 +1468,13 @@ public class SMTPClient{
             return sb.toString().trim();
         }
         
+        /**
+		 * Provides an iterator over the lines of the response text.
+		 * <p>
+		 * Iterator cannot be used to modify the response, {@code remove()} has no effect.
+		 * 
+		 * @return Iterator over the lines of the response text.
+		 */
         @Override
         public Iterator<String> iterator(){
             Iterator<String> itr = getResponseLines().iterator();
@@ -1454,6 +1495,12 @@ public class SMTPClient{
             };
         }
         
+        /**
+		 * Parses server response.
+		 * 
+		 * @param reader {@link BufferedReader} object around the server's output
+		 * @return Parsed Response object
+		 */
         public static Response getResponse(BufferedReader reader){
             Response resp = new Response();
             List<String> lines = resp.respLines;
