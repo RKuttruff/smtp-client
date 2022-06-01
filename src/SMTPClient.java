@@ -62,19 +62,19 @@ public class SMTPClient{
     private static final int SMTP_STATUS = 211;
     /**RFC 5321 Section 4.2.2: Help message (Information on how to use the receiver or the meaning of a particular non-standard command; this reply is useful only to the human user)*/
     private static final int SMTP_HELP = 214;
-    /**RFC 5321 Section 4.2.2: <domain> Service ready*/
+    /**RFC 5321 Section 4.2.2: &lt;domain&gt; Service ready*/
     private static final int SMTP_READY = 220;
-    /**RFC 5321 Section 4.2.2: <domain> Service closing transmission channel*/
+    /**RFC 5321 Section 4.2.2: &lt;domain&gt; Service closing transmission channel*/
     private static final int SMTP_CLOSING = 221;
     /**RFC 5321 Section 4.2.2: Requested mail action okay, completed*/
     private static final int SMTP_OK = 250;
-    /**RFC 5321 Section 4.2.2: User not local; will forward to <forward-path> (See Section 3.4)*/
+    /**RFC 5321 Section 4.2.2: User not local; will forward to &lt;forward-path&gt; (See Section 3.4)*/
     private static final int SMTP_WILL_FORWARD = 251;
     /**RFC 5321 Section 4.2.2: Cannot VRFY user, but will accept message and attempt delivery (See Section 3.5.3)*/
     private static final int SMTP_CANNOT_VERIFY_WILL_TRY = 252;
-    /**RFC 5321 Section 4.2.2: Start mail input; end with <CRLF>.<CRLF>*/
+    /**RFC 5321 Section 4.2.2: Start mail input; end with &lt;CRLF&gt;.&lt;CRLF&gt;*/
     private static final int SMTP_START_MAIL = 354;
-    /**RFC 5321 Section 4.2.2: <domain> Service not available, closing transmission channel (This may be a reply to any command if the service knows it must shut down)*/
+    /**RFC 5321 Section 4.2.2: &lt;domain&gt; Service not available, closing transmission channel (This may be a reply to any command if the service knows it must shut down)*/
     private static final int SMTP_UNAVAILABLE_CONNECTION_PROBLEM = 421;
     /**RFC 5321 Section 4.2.2: Requested mail action not taken: mailbox unavailable (e.g.,mailbox busy or temporarily blocked for policy reasons)*/
     private static final int SMTP_MAILBOX_UNAVAILABLE = 450;
@@ -94,7 +94,7 @@ public class SMTPClient{
     private static final int SMTP_BAD_SEQUENCE = 503;
     /**RFC 5321 Section 4.2.2: Command parameter not implemented*/
     private static final int SMTP_PARAMETER_NOT_IMPLEMENTED = 504;
-    /**RFC 5321 Section 4.2.2: User not local; please try <forward-path> (See Section 3.4)*/
+    /**RFC 5321 Section 4.2.2: User not local; please try &lt;forward-path&gt; (See Section 3.4)*/
     private static final int SMTP_INVALID_ADDRESS = 551;
     /**RFC 5321 Section 4.2.2: Requested mail action aborted: exceeded storage allocation*/
     private static final int SMTP_EXCEEDED_STORAGE_ALLOCATION = 552;
