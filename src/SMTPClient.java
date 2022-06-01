@@ -1392,6 +1392,9 @@ public class SMTPClient{
 	 * Container for server responses. 
 	 * <p>
 	 * Provides a static method to handle waiting for and reading responses.
+	 * 
+     *  @author     Riley Kuttruff
+     *  @version    1.0
  	 */
     private static class Response implements Iterable<String>{
         /**@hidden*/
