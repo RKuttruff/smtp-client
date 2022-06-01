@@ -26,90 +26,158 @@ import javax.swing.JPasswordField;
 import javax.swing.JPanel;
 
 public class SMTPClient{
-    //Basic constants
+    /*      Basic constants     */
+	/**SMTP uses Carriage return-line feed.*/
     private static final String CRLF = "\r\n";
+    /**URL for GMail SMTP server*/
     private static final String SMTP_SERVER_URL = "smtp.gmail.com";
+    /**GMail SMTP port number*/
     private static final int SMTP_SERVER_PORT = 465;
     
-    //Return codes
+    /*      Return codes        */
+    /**Program exited normally, either mail was successfully sent or no mail sent but not due to errors.*/
     public static final int ERR_OK = 0x0;
+    /**No IP address(es) for SMTP server URL could be resolved*/
     public static final int ERR_NO_HOST = 0x1;
+    /**Failed to connect to SMTP server*/
     public static final int ERR_CONNECTION_FAILED = 0x2;
+    /**General I/O Errors*/
     public static final int ERR_IO_ERROR = 0x3;
+    /**Authentication failed*/
     public static final int ERR_AUTH_FAILED = 0x4;
+    /**Nonexistant command line option*/
     public static final int ERR_INVALID_OPT = 0x5;
+    /**Command line improperly configured*/
     public static final int ERR_BAD_COMMAND_LINE = 0x6;
+    /**No valid recipients given*/
     public static final int ERR_NO_RECIPIENTS = 0x7;
+    /**GUI requested/required but not available*/
     public static final int ERR_NO_GUI = 0x8;
+    /**None of the implemented authenication methods are accepted by the server*/
     public static final int ERR_NO_VALID_AUTHS = 0xc;
     
-    //SMTP return code constants
-    //RFC 5321 4.2.2-3
-    private static final int SMTP_STATUS_A = 200;
-    private static final int SMTP_STATUS_B = 211;
+    /*      SMTP return code constants      */
+    /*      Defined in RFC 5321 4.2.2-3     */
+    /**RFC 5321 Section 4.2.2: System status, or system help reply*/
+    private static final int SMTP_STATUS = 211;
+    /**RFC 5321 Section 4.2.2: Help message (Information on how to use the receiver or the meaning of a particular non-standard command; this reply is useful only to the human user)*/
     private static final int SMTP_HELP = 214;
+    /**RFC 5321 Section 4.2.2: <domain> Service ready*/
     private static final int SMTP_READY = 220;
+    /**RFC 5321 Section 4.2.2: <domain> Service closing transmission channel*/
     private static final int SMTP_CLOSING = 221;
+    /**RFC 5321 Section 4.2.2: Requested mail action okay, completed*/
     private static final int SMTP_OK = 250;
+    /**RFC 5321 Section 4.2.2: User not local; will forward to <forward-path> (See Section 3.4)*/
     private static final int SMTP_WILL_FORWARD = 251;
+    /**RFC 5321 Section 4.2.2: Cannot VRFY user, but will accept message and attempt delivery (See Section 3.5.3)*/
     private static final int SMTP_CANNOT_VERIFY_WILL_TRY = 252;
+    /**RFC 5321 Section 4.2.2: Start mail input; end with <CRLF>.<CRLF>*/
     private static final int SMTP_START_MAIL = 354;
+    /**RFC 5321 Section 4.2.2: <domain> Service not available, closing transmission channel (This may be a reply to any command if the service knows it must shut down)*/
     private static final int SMTP_UNAVAILABLE_CONNECTION_PROBLEM = 421;
+    /**RFC 5321 Section 4.2.2: Requested mail action not taken: mailbox unavailable (e.g.,mailbox busy or temporarily blocked for policy reasons)*/
     private static final int SMTP_MAILBOX_UNAVAILABLE = 450;
+    /**RFC 5321 Section 4.2.2: Requested action aborted: local error in processing*/
     private static final int SMTP_ABORTED_LOCAL_ERROR = 451;
+    /**RFC 5321 Section 4.2.2: Requested action not taken: insufficient system storage*/
     private static final int SMTP_TOO_MANY = 452;
+    /**RFC 5321 Section 4.2.2: Server unable to accommodate parameters*/
     private static final int SMTP_UNABLE_TO_ACCOMMODATE_PARAMETERS = 455;
+    /**RFC 5321 Section 4.2.2: Syntax error, command unrecognized (This may include errors such as command line too long)*/
     private static final int SMTP_SYNTAX_ERROR = 500;
+    /**RFC 5321 Section 4.2.2: Syntax error in parameters or arguments*/
     private static final int SMTP_SYNTAX_ERROR_PARAMETERS_OR_ARGUMENTS = 501;
+    /**RFC 5321 Section 4.2.2: Command not implemented (see Section 4.2.4)*/
     private static final int SMTP_COMMAND_NOT_IMPLEMENTED = 502;
+    /**RFC 5321 Section 4.2.2: Bad sequence of commands*/
     private static final int SMTP_BAD_SEQUENCE = 503;
+    /**RFC 5321 Section 4.2.2: Command parameter not implemented*/
     private static final int SMTP_PARAMETER_NOT_IMPLEMENTED = 504;
+    /**RFC 5321 Section 4.2.2: User not local; please try <forward-path> (See Section 3.4)*/
     private static final int SMTP_INVALID_ADDRESS = 551;
+    /**RFC 5321 Section 4.2.2: Requested mail action aborted: exceeded storage allocation*/
     private static final int SMTP_EXCEEDED_STORAGE_ALLOCATION = 552;
+    /**RFC 5321 Section 4.2.2: Requested action not taken: mailbox name not allowed (e.g.,mailbox syntax incorrect)*/
     private static final int SMTP_MAILBOX_NAME_INVALID = 553;
+    /**RFC 5321 Section 4.2.2: Transaction failed (Or, in the case of a connection-opening response, "No SMTP service here")*/
     private static final int SMTP_TRANSACTION_FAILED = 554;
+    /**RFC 5321 Section 4.2.2: MAIL FROM/RCPT TO parameters not recognized or not implemented*/
     private static final int SMTP_MAILFROM_RCPTTO_NOT_RECOGNIZED = 555;
     
-    //Commands required for minimum implementation of RFC 5321 4.5.1 (Except VRFY
-    //which is not supported by gmail anyway)
+    /*      Commands required for minimum implementation of RFC 5321 4.5.1 (Except VRFY which is not supported by gmail anyway)     */
+    /**Extended session initiation command*/
     private static final String EHLO = "EHLO ";
+    /**Basic session initiation command*/
     private static final String HELO = "HELO ";
+    /**Sender address command*/
     private static final String MAIL = "MAIL FROM:<%s>";
+    /**Recipient(s) command*/
     private static final String RCPT = "RCPT TO:<%s>";
+    /**Command to begin senting mail data*/
     private static final String DATA = "DATA";
+    /**Abort current transaction and discard all stored data*/
     private static final String RSET = "RSET";
+    /**No-op. Does nothing*/
     private static final String NOOP = "NOOP";
+    /**Closes the communication channel*/
     private static final String QUIT = "QUIT";
     
-    //I/O variables
+    /*      I/O variables       */
+    /**Connection to SMTP server*/
     private static Socket socket;
+    /**Output stream to the server*/
     private static PrintWriter out;
-    private static PrintStream stdOut, stdErr;
-    private static BufferedReader in, stdIn;
+    /**Standard output*/
+    private static PrintStream stdOut;
+    /**Standard error*/
+    private static PrintStream stdErr;
+    /**Input stream from the server*/
+    private static BufferedReader in;
+    /**Standard input*/
+    private static BufferedReader stdIn;
     
-    //Session data
+    /*      Session data        */
+    /**Sender's username*/
     private static String uName;        //-from=addr
+    /**Recipient's username(s)*/
     private static String[] recipients; //-to=addr(;addr)*
+    /**Argument to the AUTH command*/
     private static byte[] authData;
+    /**User password*/
     private static char[] pass;         //-pass=password
+    /**Input file paths to file client*/
     private static List<String> files;
+    /**Authenication method to be used*/
     private static String authMethod;
+    /**Valid authenication methods (both implemented and accepted)*/
     private static String[] validAuthMethods;
     
-    //Client type data
+    /*      Client type data        */
+    /**Type of client in use*/
     private static int type;        //-type=(cli)|(gui)|(raw)|(file) ; If -type=file, files are added in cmdline after --, requires from to and pass to be set
+    /**Provide verbose output*/
     private static boolean verbose; //-v
+    /**Is standard input is being used for mail data input*/
     private static boolean pipe;
     
-    //And more constants
+    /*      And more constants      */
+    /**Command-Line interface client <u><b>(NOT IMPLEMENTED)</u></b>*/
     private static final int TYPE_CLI = 1;
+    /**Client to read from file(s) and/or standard input*/
     private static final int TYPE_FILE = 2;
+    /**GUI-based client*/
     private static final int TYPE_GUI = 3;
+    /**Raw interaction with SMTP server*/
     private static final int TYPE_RAW_SMTP = 4;
+    /**Default client: RAW*/
     private static final int TYPE_DEFAULT = TYPE_RAW_SMTP;
     
+    /**@hidden*/
+	//Used for pretty-printing IPv6 addresses
     private static final Pattern COLON = Pattern.compile(":");
     
+    /**Currently implemented authenication methods*/
     private static final String[] AUTH_METHODS = {
         "PLAIN",
         "XOAUTH2"
@@ -1332,6 +1400,7 @@ public class SMTPClient{
         }
     }
 
+	/**@hidden*/
     //The help message...
     private static final String[] HELP_MSG = {
         "Usage:",
