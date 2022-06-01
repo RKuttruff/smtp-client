@@ -33,7 +33,7 @@ import javax.swing.JPanel;
  */
 public class SMTPClient{
     /*      Basic constants     */
-	/**SMTP uses Carriage return-line feed.*/
+    /**SMTP uses Carriage return-line feed.*/
     private static final String CRLF = "\r\n";
     /**URL for GMail SMTP server*/
     private static final String SMTP_SERVER_URL = "smtp.gmail.com";
@@ -180,7 +180,7 @@ public class SMTPClient{
     private static final int TYPE_DEFAULT = TYPE_RAW_SMTP;
     
     /**@hidden*/
-	//Used for pretty-printing IPv6 addresses
+    //Used for pretty-printing IPv6 addresses
     private static final Pattern COLON = Pattern.compile(":");
     
     /**Currently implemented authenication methods*/
@@ -231,7 +231,7 @@ public class SMTPClient{
         }, "Shutdown-Cleanup"));
     }
     
-	/**@hidden*/
+    /**@hidden*/
     public static void main(String[] args) throws Exception{
         splitCommandLine(args);
         
@@ -252,17 +252,17 @@ public class SMTPClient{
     }
     
     //Tries to create a TCP socket to url:port with SSL
-	/**
-	 * Opens TCP socket to a given server.
-	 * <p>
-	 * Opens a TCP socket with SSL to {@code url:port}. First attempts to resolve the server hostname into 
-	 * IP addresses, then tries to open the connection with each. If no IP addresses can be resolved or all 
-	 * resolved IP addresses fail to connect, the program will exit.
-	 * 
-	 * @param url Server domain name
-	 * @param port Port number to connect on
-	 * @return {@link Socket} object to the remote server
-	 */
+    /**
+     * Opens TCP socket to a given server.
+     * <p>
+     * Opens a TCP socket with SSL to {@code url:port}. First attempts to resolve the server hostname into 
+     * IP addresses, then tries to open the connection with each. If no IP addresses can be resolved or all 
+     * resolved IP addresses fail to connect, the program will exit.
+     * 
+     * @param url Server domain name
+     * @param port Port number to connect on
+     * @return {@link Socket} object to the remote server
+     */
     private static Socket openConnection(String url, int port){
         InetAddress[] addresses = new InetAddress[0];
         Socket sock = null;
@@ -327,7 +327,7 @@ public class SMTPClient{
         return (addr instanceof Inet4Address) ? addr.getHostAddress() : "[" + shortenInet6Addr(addr.getHostAddress()) + "]";
     }
     
-	//Shortens in IPv6 address into a more readable format
+    //Shortens in IPv6 address into a more readable format
     /**@hidden*/
     private static String shortenInet6Addr(String ip){
         if(ip == null)
@@ -392,11 +392,11 @@ public class SMTPClient{
         return sb.toString();
     }
     
-	/**
-	 * Builds XOAUTH2 argument string.
-	 * <p>
-	 * Stores in {@link #authData}.
-	 */
+    /**
+     * Builds XOAUTH2 argument string.
+     * <p>
+     * Stores in {@link #authData}.
+     */
     private static void getXOAuth2Data(){
         Auth auth = new XOAuth2Auth();
         
@@ -407,11 +407,11 @@ public class SMTPClient{
     }
     
     //Gets username and password (if necessary) and encodes them in Base64 for PLAIN authentication
-	/**
-	 * Builds PLAIN argument string.
-	 * <p>
-	 * Stores in {@link #authData}.
- 	 */
+    /**
+     * Builds PLAIN argument string.
+     * <p>
+     * Stores in {@link #authData}.
+     */
     private static void buildPlainAuthData(){
         if(uName == null)
             getUser();
@@ -463,9 +463,9 @@ public class SMTPClient{
     }
     
     /**
-	 * Builds the authenication method argument for the selected method.
- 	 */
-	private static void buildAuthData(){
+     * Builds the authenication method argument for the selected method.
+     */
+    private static void buildAuthData(){
         switch(authMethod){
             case "PLAIN":
                 buildPlainAuthData();
@@ -477,13 +477,13 @@ public class SMTPClient{
     }
     
     //Actually submit the authentication and return the response.
-	/**
-	 * Submits the authenication command and handles the results
-	 * <p>
-	 * Program will exit upon I/O error or response code of type {@code 5xx} (Permanent Negative Completion)
-	 * 
-	 * @return A {@link Response} object containing the server's reply to the command.
- 	 */
+    /**
+     * Submits the authenication command and handles the results
+     * <p>
+     * Program will exit upon I/O error or response code of type {@code 5xx} (Permanent Negative Completion)
+     * 
+     * @return A {@link Response} object containing the server's reply to the command.
+     */
     private static Response submitAuthentication(){
         Response resp;
         
@@ -520,11 +520,11 @@ public class SMTPClient{
     }
     
     //Prompt for the username
-	/**
-	 * Gets the sender username from the user.
-	 * <p>
-	 * Stores in {@link #uName}.
- 	 */
+    /**
+     * Gets the sender username from the user.
+     * <p>
+     * Stores in {@link #uName}.
+     */
     private static void getUser(){
         stdOut.print("Enter gmail address (Ex: username@gmail.com): ");
         
@@ -538,12 +538,12 @@ public class SMTPClient{
     }
     
     //Prompt for the password (through GUI, if necessary)
-	/**
-	 * Gets the sender username from the user.
-	 * <p>
-	 * If standard input is used as an input to the file client, uses GUI if possible.
-	 * Stores in {@link #uName}.
- 	 */
+    /**
+     * Gets the sender username from the user.
+     * <p>
+     * If standard input is used as an input to the file client, uses GUI if possible.
+     * Stores in {@link #uName}.
+     */
     private static void getPass(){
         if(pipe){
             if(headless()){
@@ -588,15 +588,15 @@ public class SMTPClient{
             pass = System.console().readPassword("Enter gmail password: ");
     }
     
-	/**
-	 * Determine valid authenication methods.
-	 * <p>
-	 * Parses server response to {@code EHLO} command to determine the server's accepted authenication 
-	 * methods. These are intersected with the methods implemented by the program. If there are no valid 
-	 * methods, the program exits. If there is only one valid method, it is selected for use automatically. 
-	 * 
-	 * @param r {@link Response} object read from server after {@code EHLO} command is sent.
-	 */
+    /**
+     * Determine valid authenication methods.
+     * <p>
+     * Parses server response to {@code EHLO} command to determine the server's accepted authenication 
+     * methods. These are intersected with the methods implemented by the program. If there are no valid 
+     * methods, the program exits. If there is only one valid method, it is selected for use automatically. 
+     * 
+     * @param r {@link Response} object read from server after {@code EHLO} command is sent.
+     */
     private static void getValidAuths(Response r){
         String methods = null;
         
@@ -619,11 +619,11 @@ public class SMTPClient{
             authMethod = validAuthMethods[0];
     }
     
-	/**
-	 * Promts the user for authenication method to use.
-	 * <p>
-	 * Tries to use GUI if standard input is used as an input to the file client.
- 	 */
+    /**
+     * Promts the user for authenication method to use.
+     * <p>
+     * Tries to use GUI if standard input is used as an input to the file client.
+     */
     private static void getAuthMethod(){
         if(pipe && headless()){
             stdErr.println("Since stdin is used as an input, an alternate means of obtaining authentication information is needed (JOptionPane); however, the current environment does not support GUI.");
@@ -656,11 +656,11 @@ public class SMTPClient{
         }
     }
     
-	/**
-	 * Parses and validates the command line.
-	 * 
-	 * @param args Command line argument array provided to the {@code main} method
- 	 */
+    /**
+     * Parses and validates the command line.
+     * 
+     * @param args Command line argument array provided to the {@code main} method
+     */
     private static void splitCommandLine(String[] args){
         boolean typeSet = false;        //-type option has been set
         boolean fileSet = false;        //-type=file option has been set
@@ -875,9 +875,9 @@ public class SMTPClient{
         }
     }
     
-	/**
-	 * Print the help message and exit
- 	 */
+    /**
+     * Print the help message and exit
+     */
     private static void help(){
         for(String helpLn : HELP_MSG)
             stdOut.println(helpLn);
@@ -910,15 +910,15 @@ public class SMTPClient{
     }
     
     //Prints a prompt, loops until user enters y or n
-	/**
-	 * Promts the user with a yes/no choice.
-	 * 
-	 * Returns choice as {@code boolean}.
-	 * 
-	 * @param prompt Custom prompt text
-	 * @return The user's choice as a {@code boolean} value.
-	 * @see #selectOption
- 	 */
+    /**
+     * Promts the user with a yes/no choice.
+     * 
+     * Returns choice as {@code boolean}.
+     * 
+     * @param prompt Custom prompt text
+     * @return The user's choice as a {@code boolean} value.
+     * @see #selectOption
+     */
     private static boolean yesNo(String prompt){
         String resp;
         
@@ -944,9 +944,9 @@ public class SMTPClient{
     }
     
     //Raw client implementation
-	/**
-	 * Runs the raw SMTP interaction client
- 	 */
+    /**
+     * Runs the raw SMTP interaction client
+     */
     private static void rawClient(){
         String inputString;
         
@@ -1050,9 +1050,9 @@ public class SMTPClient{
     }
     
     //GUI client implementation
-	/**
-	 * Runs the GUI SMTP client
- 	 */
+    /**
+     * Runs the GUI SMTP client
+     */
     private static void guiClient(){
         if(headless()){     //MUST be able to use GUIs in the first place...
             stdErr.println("Current environment does not support GUI!");
@@ -1212,9 +1212,9 @@ public class SMTPClient{
     }
     
     //File client
-	/**
-	 * Runs the SMTP file based input client
- 	 */
+    /**
+     * Runs the SMTP file based input client
+     */
     private static void fileClient(){
         socket = openConnection(SMTP_SERVER_URL, SMTP_SERVER_PORT);
         
@@ -1357,14 +1357,14 @@ public class SMTPClient{
     }
     
     //Print a list of options to select from and return the chosen option
-	/**
-	 * Promts the user with a multiple choices.
-	 * 
-	 * @param what What the user is chposing
-	 * @param options The user's options
-	 * @return The user's choice
-	 * @see #yesNo
- 	 */
+    /**
+     * Promts the user with a multiple choices.
+     * 
+     * @param what What the user is chposing
+     * @param options The user's options
+     * @return The user's choice
+     * @see #yesNo
+     */
     private static String selectOption(String what, String... options){
         int n = options.length;
         
@@ -1388,14 +1388,14 @@ public class SMTPClient{
     }
     
     //
-	/**
-	 * Container for server responses. 
-	 * <p>
-	 * Provides a static method to handle waiting for and reading responses.
-	 * 
+    /**
+     * Container for server responses. 
+     * <p>
+     * Provides a static method to handle waiting for and reading responses.
+     * 
      *  @author     Riley Kuttruff
      *  @version    1.0
- 	 */
+     */
     private static class Response implements Iterable<String>{
         /**@hidden*/
         private int respCode, respType;
@@ -1411,56 +1411,56 @@ public class SMTPClient{
             SP = Pattern.compile(" ");
         }
         
-		/**
-		 * Default constructor.
-		 */
+        /**
+         * Default constructor.
+         */
         private Response(){
             respCode = respType = -1;
             respLines = new ArrayList<String>();
         }
         
         /**
-		 * Returns the response code from the server.
-		 * 
-		 * @return Server's response code
-		 */
+         * Returns the response code from the server.
+         * 
+         * @return Server's response code
+         */
         public int getResponseCode(){
             return respCode;
         }
         
         /**
-		 * Returns the type of this response's response code.
-		 * 
-		 * @return Server's response code type (First digit)
-		 */
+         * Returns the type of this response's response code.
+         * 
+         * @return Server's response code type (First digit)
+         */
         public int getResponseCodeType(){
             return respType;
         }
         
         /**
-		 * Lines of the response text.
-		 * <p>
-		 * Returned as an unmodifiable list.
-		 * 
-		 * @return {@link java.util.List} object containing the response text line-by-line.
-		 * @see Collections##unmodifiableList(java.util.List)
-		 */
+         * Lines of the response text.
+         * <p>
+         * Returned as an unmodifiable list.
+         * 
+         * @return {@link java.util.List} object containing the response text line-by-line.
+         * @see Collections##unmodifiableList(java.util.List)
+         */
         public List<String> getResponseLines(){
             return Collections.unmodifiableList(respLines);
         }
         
         /**
-		 * Print this response to standard output.
-		 */
+         * Print this response to standard output.
+         */
         public void print(){
             stdOut.println(this);
         }
         
         /**
-		 * Reconstructs the text of the server's response.
-		 * 
-		 * @return Response text
-		 */
+         * Reconstructs the text of the server's response.
+         * 
+         * @return Response text
+         */
         @Override
         public String toString(){
             StringBuilder sb = new StringBuilder();
@@ -1472,12 +1472,12 @@ public class SMTPClient{
         }
         
         /**
-		 * Provides an iterator over the lines of the response text.
-		 * <p>
-		 * Iterator cannot be used to modify the response, {@code remove()} has no effect.
-		 * 
-		 * @return Iterator over the lines of the response text.
-		 */
+         * Provides an iterator over the lines of the response text.
+         * <p>
+         * Iterator cannot be used to modify the response, {@code remove()} has no effect.
+         * 
+         * @return Iterator over the lines of the response text.
+         */
         @Override
         public Iterator<String> iterator(){
             Iterator<String> itr = getResponseLines().iterator();
@@ -1499,11 +1499,11 @@ public class SMTPClient{
         }
         
         /**
-		 * Parses server response.
-		 * 
-		 * @param reader {@link BufferedReader} object around the server's output
-		 * @return Parsed Response object
-		 */
+         * Parses server response.
+         * 
+         * @param reader {@link BufferedReader} object around the server's output
+         * @return Parsed Response object
+         */
         public static Response getResponse(BufferedReader reader){
             Response resp = new Response();
             List<String> lines = resp.respLines;
@@ -1549,7 +1549,7 @@ public class SMTPClient{
         }
     }
 
-	/**@hidden*/
+    /**@hidden*/
     //The help message...
     private static final String[] HELP_MSG = {
         "Usage:",
