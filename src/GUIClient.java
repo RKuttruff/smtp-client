@@ -301,17 +301,32 @@ class GUIClient extends JFrame{
         
     }
     
+	/**
+	 * Container class for important data used by the client.
+	 * <p>
+	 * Passes back to {@link SMTPClient} data such as username, recipients, message subject and message 
+	 * text.
+	 */
     public static class ClientData{
-        private boolean done;
+        /**If the data contained is complete and ready to be passed to the SMTP server*/
+		private boolean done;
         
+		/**Sender's username*/
         public String uName;
+		/**User password*/
         public char[] pass;
+		/**Recipient's username(s)*/
         public String[] recipients;
         
+		/**Message subject*/
         public String subject;
         
+		/**List of each line of message text*/
         public List<String> messageLines;
         
+		/**
+		 * Default constructor
+		 */
         public ClientData(){
             uName = null;
             pass = null;
@@ -324,6 +339,9 @@ class GUIClient extends JFrame{
             done = false;
         }
         
+		/**
+		 * Returns if the data contained is complete and ready to be passed to the SMTP server
+		 */
         public boolean isDone(){
             return done;
         }
