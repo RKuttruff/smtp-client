@@ -31,7 +31,7 @@ import javax.swing.JPanel;
  *  @author     Riley Kuttruff
  *  @version    1.0
  */
-public class SMTPClient{
+public class SMTPClient implements SMTPConstants, ExitCodes{
     /*      Basic constants     */
     /**SMTP uses Carriage return-line feed.*/
     private static final String CRLF = "\r\n";
@@ -39,95 +39,6 @@ public class SMTPClient{
     private static final String SMTP_SERVER_URL = "smtp.gmail.com";
     /**GMail SMTP port number*/
     private static final int SMTP_SERVER_PORT = 465;
-    
-    /*      Return codes        */
-    /**Program exited normally, either mail was successfully sent or no mail sent but not due to errors.*/
-    public static final int ERR_OK = 0x0;
-    /**No IP address(es) for SMTP server URL could be resolved*/
-    public static final int ERR_NO_HOST = 0x1;
-    /**Failed to connect to SMTP server*/
-    public static final int ERR_CONNECTION_FAILED = 0x2;
-    /**General I/O Errors*/
-    public static final int ERR_IO_ERROR = 0x3;
-    /**Authentication failed*/
-    public static final int ERR_AUTH_FAILED = 0x4;
-    /**Nonexistant command line option*/
-    public static final int ERR_INVALID_OPT = 0x5;
-    /**Command line improperly configured*/
-    public static final int ERR_BAD_COMMAND_LINE = 0x6;
-    /**No valid recipients given*/
-    public static final int ERR_NO_RECIPIENTS = 0x7;
-    /**GUI requested/required but not available*/
-    public static final int ERR_NO_GUI = 0x8;
-    /**None of the implemented authenication methods are accepted by the server*/
-    public static final int ERR_NO_VALID_AUTHS = 0xc;
-    
-    /*      SMTP return code constants      */
-    /*      Defined in RFC 5321 4.2.2-3     */
-    /**RFC 5321 Section 4.2.2: System status, or system help reply*/
-    private static final int SMTP_STATUS = 211;
-    /**RFC 5321 Section 4.2.2: Help message (Information on how to use the receiver or the meaning of a particular non-standard command; this reply is useful only to the human user)*/
-    private static final int SMTP_HELP = 214;
-    /**RFC 5321 Section 4.2.2: &lt;domain&gt; Service ready*/
-    private static final int SMTP_READY = 220;
-    /**RFC 5321 Section 4.2.2: &lt;domain&gt; Service closing transmission channel*/
-    private static final int SMTP_CLOSING = 221;
-    /**RFC 5321 Section 4.2.2: Requested mail action okay, completed*/
-    private static final int SMTP_OK = 250;
-    /**RFC 5321 Section 4.2.2: User not local; will forward to &lt;forward-path&gt; (See Section 3.4)*/
-    private static final int SMTP_WILL_FORWARD = 251;
-    /**RFC 5321 Section 4.2.2: Cannot VRFY user, but will accept message and attempt delivery (See Section 3.5.3)*/
-    private static final int SMTP_CANNOT_VERIFY_WILL_TRY = 252;
-    /**RFC 5321 Section 4.2.2: Start mail input; end with &lt;CRLF&gt;.&lt;CRLF&gt;*/
-    private static final int SMTP_START_MAIL = 354;
-    /**RFC 5321 Section 4.2.2: &lt;domain&gt; Service not available, closing transmission channel (This may be a reply to any command if the service knows it must shut down)*/
-    private static final int SMTP_UNAVAILABLE_CONNECTION_PROBLEM = 421;
-    /**RFC 5321 Section 4.2.2: Requested mail action not taken: mailbox unavailable (e.g.,mailbox busy or temporarily blocked for policy reasons)*/
-    private static final int SMTP_MAILBOX_UNAVAILABLE = 450;
-    /**RFC 5321 Section 4.2.2: Requested action aborted: local error in processing*/
-    private static final int SMTP_ABORTED_LOCAL_ERROR = 451;
-    /**RFC 5321 Section 4.2.2: Requested action not taken: insufficient system storage*/
-    private static final int SMTP_TOO_MANY = 452;
-    /**RFC 5321 Section 4.2.2: Server unable to accommodate parameters*/
-    private static final int SMTP_UNABLE_TO_ACCOMMODATE_PARAMETERS = 455;
-    /**RFC 5321 Section 4.2.2: Syntax error, command unrecognized (This may include errors such as command line too long)*/
-    private static final int SMTP_SYNTAX_ERROR = 500;
-    /**RFC 5321 Section 4.2.2: Syntax error in parameters or arguments*/
-    private static final int SMTP_SYNTAX_ERROR_PARAMETERS_OR_ARGUMENTS = 501;
-    /**RFC 5321 Section 4.2.2: Command not implemented (see Section 4.2.4)*/
-    private static final int SMTP_COMMAND_NOT_IMPLEMENTED = 502;
-    /**RFC 5321 Section 4.2.2: Bad sequence of commands*/
-    private static final int SMTP_BAD_SEQUENCE = 503;
-    /**RFC 5321 Section 4.2.2: Command parameter not implemented*/
-    private static final int SMTP_PARAMETER_NOT_IMPLEMENTED = 504;
-    /**RFC 5321 Section 4.2.2: User not local; please try &lt;forward-path&gt; (See Section 3.4)*/
-    private static final int SMTP_INVALID_ADDRESS = 551;
-    /**RFC 5321 Section 4.2.2: Requested mail action aborted: exceeded storage allocation*/
-    private static final int SMTP_EXCEEDED_STORAGE_ALLOCATION = 552;
-    /**RFC 5321 Section 4.2.2: Requested action not taken: mailbox name not allowed (e.g.,mailbox syntax incorrect)*/
-    private static final int SMTP_MAILBOX_NAME_INVALID = 553;
-    /**RFC 5321 Section 4.2.2: Transaction failed (Or, in the case of a connection-opening response, "No SMTP service here")*/
-    private static final int SMTP_TRANSACTION_FAILED = 554;
-    /**RFC 5321 Section 4.2.2: MAIL FROM/RCPT TO parameters not recognized or not implemented*/
-    private static final int SMTP_MAILFROM_RCPTTO_NOT_RECOGNIZED = 555;
-    
-    /*      Commands required for minimum implementation of RFC 5321 4.5.1 (Except VRFY which is not supported by gmail anyway)     */
-    /**Extended session initiation command*/
-    private static final String EHLO = "EHLO ";
-    /**Basic session initiation command*/
-    private static final String HELO = "HELO ";
-    /**Sender address command*/
-    private static final String MAIL = "MAIL FROM:<%s>";
-    /**Recipient(s) command*/
-    private static final String RCPT = "RCPT TO:<%s>";
-    /**Command to begin senting mail data*/
-    private static final String DATA = "DATA";
-    /**Abort current transaction and discard all stored data*/
-    private static final String RSET = "RSET";
-    /**No-op. Does nothing*/
-    private static final String NOOP = "NOOP";
-    /**Closes the communication channel*/
-    private static final String QUIT = "QUIT";
     
     /*      I/O variables       */
     /**Connection to SMTP server*/

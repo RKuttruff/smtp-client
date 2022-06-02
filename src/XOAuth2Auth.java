@@ -19,7 +19,7 @@ import java.io.*;
  *  @author     Riley Kuttruff
  *  @version    1.0
  */
-public class XOAuth2Auth implements Auth{
+public class XOAuth2Auth implements Auth, ExitCodes{
     
     /**Subprocess command for when a Python interpreter is available in the PATH.*/
     private static final String[] INT_CMD = {"python3", "auth.py"};

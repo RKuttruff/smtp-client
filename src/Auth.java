@@ -19,13 +19,6 @@
  *  @version    1.0
  */
 public interface Auth{
-    /**Error code: Needed authentication information file has not been found*/
-    static final int ERR_AUTH_INFO_NOT_FOUND = 0x9;
-    /**Error code: Authentication information file is missing data needed for specified method.*/
-    static final int ERR_AUTH_INFO_INCOMPLETE = 0xa;
-    /**Error code: Authentication child process failed.*/
-    static final int ERR_AUTH_SUBPROC_FAILED = 0xb;
-    
     /**
      * Produce authentication data.
      * <p>
