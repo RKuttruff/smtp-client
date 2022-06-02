@@ -40,28 +40,6 @@ public class SMTPClient{
     /**GMail SMTP port number*/
     private static final int SMTP_SERVER_PORT = 465;
     
-    /*      Return codes        */
-    /**Program exited normally, either mail was successfully sent or no mail sent but not due to errors.*/
-    public static final int ERR_OK = 0x0;
-    /**No IP address(es) for SMTP server URL could be resolved*/
-    public static final int ERR_NO_HOST = 0x1;
-    /**Failed to connect to SMTP server*/
-    public static final int ERR_CONNECTION_FAILED = 0x2;
-    /**General I/O Errors*/
-    public static final int ERR_IO_ERROR = 0x3;
-    /**Authentication failed*/
-    public static final int ERR_AUTH_FAILED = 0x4;
-    /**Nonexistant command line option*/
-    public static final int ERR_INVALID_OPT = 0x5;
-    /**Command line improperly configured*/
-    public static final int ERR_BAD_COMMAND_LINE = 0x6;
-    /**No valid recipients given*/
-    public static final int ERR_NO_RECIPIENTS = 0x7;
-    /**GUI requested/required but not available*/
-    public static final int ERR_NO_GUI = 0x8;
-    /**None of the implemented authenication methods are accepted by the server*/
-    public static final int ERR_NO_VALID_AUTHS = 0xc;
-    
     /*      SMTP return code constants      */
     /*      Defined in RFC 5321 4.2.2-3     */
     /**RFC 5321 Section 4.2.2: System status, or system help reply*/
