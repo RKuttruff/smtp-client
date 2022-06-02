@@ -25,92 +25,165 @@ import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JPanel;
 
+/**
+ *  Main class for the simple SMTP client.
+ *
+ *  @author     Riley Kuttruff
+ *  @version    1.0
+ */
 public class SMTPClient{
-    //Basic constants
+    /*      Basic constants     */
+    /**SMTP uses Carriage return-line feed.*/
     private static final String CRLF = "\r\n";
+    /**URL for GMail SMTP server*/
     private static final String SMTP_SERVER_URL = "smtp.gmail.com";
+    /**GMail SMTP port number*/
     private static final int SMTP_SERVER_PORT = 465;
     
-    //Return codes
+    /*      Return codes        */
+    /**Program exited normally, either mail was successfully sent or no mail sent but not due to errors.*/
     public static final int ERR_OK = 0x0;
+    /**No IP address(es) for SMTP server URL could be resolved*/
     public static final int ERR_NO_HOST = 0x1;
+    /**Failed to connect to SMTP server*/
     public static final int ERR_CONNECTION_FAILED = 0x2;
+    /**General I/O Errors*/
     public static final int ERR_IO_ERROR = 0x3;
+    /**Authentication failed*/
     public static final int ERR_AUTH_FAILED = 0x4;
+    /**Nonexistant command line option*/
     public static final int ERR_INVALID_OPT = 0x5;
+    /**Command line improperly configured*/
     public static final int ERR_BAD_COMMAND_LINE = 0x6;
+    /**No valid recipients given*/
     public static final int ERR_NO_RECIPIENTS = 0x7;
+    /**GUI requested/required but not available*/
     public static final int ERR_NO_GUI = 0x8;
+    /**None of the implemented authenication methods are accepted by the server*/
     public static final int ERR_NO_VALID_AUTHS = 0xc;
     
-    //SMTP return code constants
-    //RFC 5321 4.2.2-3
-    private static final int SMTP_STATUS_A = 200;
-    private static final int SMTP_STATUS_B = 211;
+    /*      SMTP return code constants      */
+    /*      Defined in RFC 5321 4.2.2-3     */
+    /**RFC 5321 Section 4.2.2: System status, or system help reply*/
+    private static final int SMTP_STATUS = 211;
+    /**RFC 5321 Section 4.2.2: Help message (Information on how to use the receiver or the meaning of a particular non-standard command; this reply is useful only to the human user)*/
     private static final int SMTP_HELP = 214;
+    /**RFC 5321 Section 4.2.2: &lt;domain&gt; Service ready*/
     private static final int SMTP_READY = 220;
+    /**RFC 5321 Section 4.2.2: &lt;domain&gt; Service closing transmission channel*/
     private static final int SMTP_CLOSING = 221;
+    /**RFC 5321 Section 4.2.2: Requested mail action okay, completed*/
     private static final int SMTP_OK = 250;
+    /**RFC 5321 Section 4.2.2: User not local; will forward to &lt;forward-path&gt; (See Section 3.4)*/
     private static final int SMTP_WILL_FORWARD = 251;
+    /**RFC 5321 Section 4.2.2: Cannot VRFY user, but will accept message and attempt delivery (See Section 3.5.3)*/
     private static final int SMTP_CANNOT_VERIFY_WILL_TRY = 252;
+    /**RFC 5321 Section 4.2.2: Start mail input; end with &lt;CRLF&gt;.&lt;CRLF&gt;*/
     private static final int SMTP_START_MAIL = 354;
+    /**RFC 5321 Section 4.2.2: &lt;domain&gt; Service not available, closing transmission channel (This may be a reply to any command if the service knows it must shut down)*/
     private static final int SMTP_UNAVAILABLE_CONNECTION_PROBLEM = 421;
+    /**RFC 5321 Section 4.2.2: Requested mail action not taken: mailbox unavailable (e.g.,mailbox busy or temporarily blocked for policy reasons)*/
     private static final int SMTP_MAILBOX_UNAVAILABLE = 450;
+    /**RFC 5321 Section 4.2.2: Requested action aborted: local error in processing*/
     private static final int SMTP_ABORTED_LOCAL_ERROR = 451;
+    /**RFC 5321 Section 4.2.2: Requested action not taken: insufficient system storage*/
     private static final int SMTP_TOO_MANY = 452;
+    /**RFC 5321 Section 4.2.2: Server unable to accommodate parameters*/
     private static final int SMTP_UNABLE_TO_ACCOMMODATE_PARAMETERS = 455;
+    /**RFC 5321 Section 4.2.2: Syntax error, command unrecognized (This may include errors such as command line too long)*/
     private static final int SMTP_SYNTAX_ERROR = 500;
+    /**RFC 5321 Section 4.2.2: Syntax error in parameters or arguments*/
     private static final int SMTP_SYNTAX_ERROR_PARAMETERS_OR_ARGUMENTS = 501;
+    /**RFC 5321 Section 4.2.2: Command not implemented (see Section 4.2.4)*/
     private static final int SMTP_COMMAND_NOT_IMPLEMENTED = 502;
+    /**RFC 5321 Section 4.2.2: Bad sequence of commands*/
     private static final int SMTP_BAD_SEQUENCE = 503;
+    /**RFC 5321 Section 4.2.2: Command parameter not implemented*/
     private static final int SMTP_PARAMETER_NOT_IMPLEMENTED = 504;
+    /**RFC 5321 Section 4.2.2: User not local; please try &lt;forward-path&gt; (See Section 3.4)*/
     private static final int SMTP_INVALID_ADDRESS = 551;
+    /**RFC 5321 Section 4.2.2: Requested mail action aborted: exceeded storage allocation*/
     private static final int SMTP_EXCEEDED_STORAGE_ALLOCATION = 552;
+    /**RFC 5321 Section 4.2.2: Requested action not taken: mailbox name not allowed (e.g.,mailbox syntax incorrect)*/
     private static final int SMTP_MAILBOX_NAME_INVALID = 553;
+    /**RFC 5321 Section 4.2.2: Transaction failed (Or, in the case of a connection-opening response, "No SMTP service here")*/
     private static final int SMTP_TRANSACTION_FAILED = 554;
+    /**RFC 5321 Section 4.2.2: MAIL FROM/RCPT TO parameters not recognized or not implemented*/
     private static final int SMTP_MAILFROM_RCPTTO_NOT_RECOGNIZED = 555;
     
-    //Commands required for minimum implementation of RFC 5321 4.5.1 (Except VRFY
-    //which is not supported by gmail anyway)
+    /*      Commands required for minimum implementation of RFC 5321 4.5.1 (Except VRFY which is not supported by gmail anyway)     */
+    /**Extended session initiation command*/
     private static final String EHLO = "EHLO ";
+    /**Basic session initiation command*/
     private static final String HELO = "HELO ";
+    /**Sender address command*/
     private static final String MAIL = "MAIL FROM:<%s>";
+    /**Recipient(s) command*/
     private static final String RCPT = "RCPT TO:<%s>";
+    /**Command to begin senting mail data*/
     private static final String DATA = "DATA";
+    /**Abort current transaction and discard all stored data*/
     private static final String RSET = "RSET";
+    /**No-op. Does nothing*/
     private static final String NOOP = "NOOP";
+    /**Closes the communication channel*/
     private static final String QUIT = "QUIT";
     
-    //I/O variables
+    /*      I/O variables       */
+    /**Connection to SMTP server*/
     private static Socket socket;
+    /**Output stream to the server*/
     private static PrintWriter out;
-    private static PrintStream stdOut, stdErr;
-    private static BufferedReader in, stdIn;
+    /**Standard output*/
+    private static PrintStream stdOut;
+    /**Standard error*/
+    private static PrintStream stdErr;
+    /**Input stream from the server*/
+    private static BufferedReader in;
+    /**Standard input*/
+    private static BufferedReader stdIn;
     
-    //Session data
+    /*      Session data        */
+    /**Sender's username*/
     private static String uName;        //-from=addr
+    /**Recipient's username(s)*/
     private static String[] recipients; //-to=addr(;addr)*
+    /**Argument to the AUTH command*/
     private static byte[] authData;
+    /**User password*/
     private static char[] pass;         //-pass=password
+    /**Input file paths to file client*/
     private static List<String> files;
+    /**Authenication method to be used*/
     private static String authMethod;
+    /**Valid authenication methods (both implemented and accepted)*/
     private static String[] validAuthMethods;
     
-    //Client type data
+    /*      Client type data        */
+    /**Type of client in use*/
     private static int type;        //-type=(cli)|(gui)|(raw)|(file) ; If -type=file, files are added in cmdline after --, requires from to and pass to be set
+    /**Provide verbose output*/
     private static boolean verbose; //-v
+    /**Is standard input is being used for mail data input*/
     private static boolean pipe;
     
-    //And more constants
+    /*      And more constants      */
+    /**Command-Line interface client <u><b>(NOT IMPLEMENTED)</u></b>*/
     private static final int TYPE_CLI = 1;
+    /**Client to read from file(s) and/or standard input*/
     private static final int TYPE_FILE = 2;
+    /**GUI-based client*/
     private static final int TYPE_GUI = 3;
+    /**Raw interaction with SMTP server*/
     private static final int TYPE_RAW_SMTP = 4;
+    /**Default client: RAW*/
     private static final int TYPE_DEFAULT = TYPE_RAW_SMTP;
-    //private static final int TYPE_DEFAULT = TYPE_GUI;
     
+    /**@hidden*/
+    //Used for pretty-printing IPv6 addresses
     private static final Pattern COLON = Pattern.compile(":");
     
+    /**Currently implemented authenication methods*/
     private static final String[] AUTH_METHODS = {
         "PLAIN",
         "XOAUTH2"
@@ -158,6 +231,7 @@ public class SMTPClient{
         }, "Shutdown-Cleanup"));
     }
     
+    /**@hidden*/
     public static void main(String[] args) throws Exception{
         splitCommandLine(args);
         
@@ -178,6 +252,17 @@ public class SMTPClient{
     }
     
     //Tries to create a TCP socket to url:port with SSL
+    /**
+     * Opens TCP socket to a given server.
+     * <p>
+     * Opens a TCP socket with SSL to {@code url:port}. First attempts to resolve the server hostname into 
+     * IP addresses, then tries to open the connection with each. If no IP addresses can be resolved or all 
+     * resolved IP addresses fail to connect, the program will exit.
+     * 
+     * @param url Server domain name
+     * @param port Port number to connect on
+     * @return {@link Socket} object to the remote server
+     */
     private static Socket openConnection(String url, int port){
         InetAddress[] addresses = new InetAddress[0];
         Socket sock = null;
@@ -185,6 +270,7 @@ public class SMTPClient{
         if(verbose)
             stdOut.print("Resolving hostname " + url + "...");
         
+		//Try to resolve hostname
         try{
             addresses = InetAddress.getAllByName(url);
         }
@@ -206,6 +292,8 @@ public class SMTPClient{
         
         SocketFactory factory = SSLSocketFactory.getDefault();
         
+		//Loop through the resolved addresses and try to connect on the given port
+		//Return on first success
         for(InetAddress addr : addresses){
             String addrString = inetAddressToHostString(addr);
             
@@ -237,10 +325,13 @@ public class SMTPClient{
     }
     
     //Formats printing of IP addresses
+    /**@hidden*/
     private static String inetAddressToHostString(InetAddress addr){
         return (addr instanceof Inet4Address) ? addr.getHostAddress() : "[" + shortenInet6Addr(addr.getHostAddress()) + "]";
     }
     
+    //Shortens in IPv6 address into a more readable format
+    /**@hidden*/
     private static String shortenInet6Addr(String ip){
         if(ip == null)
             return ip;
@@ -304,6 +395,11 @@ public class SMTPClient{
         return sb.toString();
     }
     
+    /**
+     * Builds XOAUTH2 argument string.
+     * <p>
+     * Stores in {@link #authData}.
+     */
     private static void getXOAuth2Data(){
         Auth auth = new XOAuth2Auth();
         
@@ -314,6 +410,11 @@ public class SMTPClient{
     }
     
     //Gets username and password (if necessary) and encodes them in Base64 for PLAIN authentication
+    /**
+     * Builds PLAIN argument string.
+     * <p>
+     * Stores in {@link #authData}.
+     */
     private static void buildPlainAuthData(){
         if(uName == null)
             getUser();
@@ -364,6 +465,9 @@ public class SMTPClient{
         Arrays.fill(auth, (byte)0);
     }
     
+    /**
+     * Builds the authenication method argument for the selected method.
+     */
     private static void buildAuthData(){
         switch(authMethod){
             case "PLAIN":
@@ -376,6 +480,13 @@ public class SMTPClient{
     }
     
     //Actually submit the authentication and return the response.
+    /**
+     * Submits the authenication command and handles the results
+     * <p>
+     * Program will exit upon I/O error or response code of type {@code 5xx} (Permanent Negative Completion)
+     * 
+     * @return A {@link Response} object containing the server's reply to the command.
+     */
     private static Response submitAuthentication(){
         Response resp;
         
@@ -412,6 +523,11 @@ public class SMTPClient{
     }
     
     //Prompt for the username
+    /**
+     * Gets the sender username from the user.
+     * <p>
+     * Stores in {@link #uName}.
+     */
     private static void getUser(){
         stdOut.print("Enter gmail address (Ex: username@gmail.com): ");
         
@@ -425,6 +541,12 @@ public class SMTPClient{
     }
     
     //Prompt for the password (through GUI, if necessary)
+    /**
+     * Gets the sender username from the user.
+     * <p>
+     * If standard input is used as an input to the file client, uses GUI if possible.
+     * Stores in {@link #uName}.
+     */
     private static void getPass(){
         if(pipe){
             if(headless()){
@@ -469,6 +591,15 @@ public class SMTPClient{
             pass = System.console().readPassword("Enter gmail password: ");
     }
     
+    /**
+     * Determine valid authenication methods.
+     * <p>
+     * Parses server response to {@code EHLO} command to determine the server's accepted authenication 
+     * methods. These are intersected with the methods implemented by the program. If there are no valid 
+     * methods, the program exits. If there is only one valid method, it is selected for use automatically. 
+     * 
+     * @param r {@link Response} object read from server after {@code EHLO} command is sent.
+     */
     private static void getValidAuths(Response r){
         String methods = null;
         
@@ -491,6 +622,11 @@ public class SMTPClient{
             authMethod = validAuthMethods[0];
     }
     
+    /**
+     * Promts the user for authenication method to use.
+     * <p>
+     * Tries to use GUI if standard input is used as an input to the file client.
+     */
     private static void getAuthMethod(){
         if(pipe && headless()){
             stdErr.println("Since stdin is used as an input, an alternate means of obtaining authentication information is needed (JOptionPane); however, the current environment does not support GUI.");
@@ -523,7 +659,11 @@ public class SMTPClient{
         }
     }
     
-    //Parse the command line...
+    /**
+     * Parses and validates the command line.
+     * 
+     * @param args Command line argument array provided to the {@code main} method
+     */
     private static void splitCommandLine(String[] args){
         boolean typeSet = false;        //-type option has been set
         boolean fileSet = false;        //-type=file option has been set
@@ -628,7 +768,7 @@ public class SMTPClient{
                     if(!valid){
                         stdErr.println("Invalid auth method: " + am);
                         
-                        System.exit(ERR_INVALID_OPT);
+                        System.exit(ERR_BAD_COMMAND_LINE);
                     }
                     
                     authMethod = am;
@@ -726,6 +866,7 @@ public class SMTPClient{
     }
     
     //Convenience method to split -key=value arguments
+    /**@hidden*/
     private static String splitKeyValue(String kv){
         try{
             String v = kv.split("=", 2)[1];
@@ -737,7 +878,9 @@ public class SMTPClient{
         }
     }
     
-    //Print the help message and exit
+    /**
+     * Print the help message and exit
+     */
     private static void help(){
         for(String helpLn : HELP_MSG)
             stdOut.println(helpLn);
@@ -745,6 +888,8 @@ public class SMTPClient{
         System.exit(ERR_OK);
     }
     
+	//Convenience method
+    /**@hidden*/
     private static String readLine(BufferedReader reader){
         try{
             return reader.readLine();
@@ -755,18 +900,29 @@ public class SMTPClient{
     }
     
     //Verbose output only if -v set
+    /**@hidden*/
     private static void logVerbose(String str){
         if(verbose)
             stdOut.println(str);
     }
     
     //Verbose output only if -v set
+    /**@hidden*/
     private static void logVerbose(Object str){
         if(verbose)
             stdOut.println(str.toString());
     }
     
     //Prints a prompt, loops until user enters y or n
+    /**
+     * Promts the user with a yes/no choice.
+     * 
+     * Returns choice as {@code boolean}.
+     * 
+     * @param prompt Custom prompt text
+     * @return The user's choice as a {@code boolean} value.
+     * @see #selectOption
+     */
     private static boolean yesNo(String prompt){
         String resp;
         
@@ -782,7 +938,7 @@ public class SMTPClient{
                     b = true;
                 else if(resp.equalsIgnoreCase("n"))
                     b = false;
-            }while(b == null);
+            }while(b == null);	//Loop until user enters a valid input
         }
         catch(IOException e){
             return false;
@@ -792,6 +948,9 @@ public class SMTPClient{
     }
     
     //Raw client implementation
+    /**
+     * Runs the raw SMTP interaction client
+     */
     private static void rawClient(){
         String inputString;
         
@@ -799,9 +958,11 @@ public class SMTPClient{
         
         boolean autoEHLO, autoAUTH;
         
+		//Prompt user whether they want EHLO/AUTH commands to be sent
         autoEHLO = yesNo("Automatically send EHLO? ");
-        autoAUTH = yesNo("Automatically generate & submit authentication? ");
+        autoAUTH = autoEHLO ? yesNo("Automatically generate & submit authentication? ") : false;	//Don't auto sent AUTH if EHLO hasn't been sent & processed
         
+		//Open the connection...
         socket = openConnection(SMTP_SERVER_URL, SMTP_SERVER_PORT);
         
         Response resp = Response.getResponse(in);
@@ -815,8 +976,8 @@ public class SMTPClient{
         
         boolean msgBody = false;
         
-        for(;;){
-            if(autoEHLO){
+        for(;;){	//Main loop
+            if(autoEHLO){		//Send EHLO if user wants
                 inputString = EHLO + "localhost";
                 stdOut.println(inputString);
                 autoEHLO = false;
@@ -848,11 +1009,13 @@ public class SMTPClient{
                 System.exit(ERR_IO_ERROR);
             }
             
+			//In the message body, terminate message body (resume waiting for responses) on single '.'
             if(msgBody && inputString.trim().equals("."))
                 msgBody = false;
             
-            out.println(inputString);
+            out.println(inputString);	//Send what the user types
             
+			//If we're in the message body, loop instead of waiting for the server to respond
             if(msgBody)
                 continue;   //Since server does not reply between DATA and ., skip getting the response
                             //since it will block forever trying to read from the socket
@@ -860,11 +1023,11 @@ public class SMTPClient{
             resp = Response.getResponse(in);
             resp.print();
             
-            if(resp.getResponseCodeType() == 5){
+            if(resp.getResponseCodeType() == 5){	//Exit if an error occurs
                 stdErr.println("SMTP Error - " + resp.getResponseCode());
                 System.exit(resp.getResponseCode());
             }
-            else if(resp.getResponseCode() == SMTP_CLOSING){
+            else if(resp.getResponseCode() == SMTP_CLOSING){	//When we're done
                 if(verbose)
                     stdOut.println("Transaction complete - closing...");
                 
@@ -882,18 +1045,22 @@ public class SMTPClient{
                 
                 System.exit(ERR_OK);
             }
-            else if(resp.getResponseCode() == SMTP_START_MAIL)
+            else if(resp.getResponseCode() == SMTP_START_MAIL)	//Start message body when the server is ready
                 msgBody = true;
         }
     }
     
     //CLI client NON-implementation
+    /**@hidden*/
     private static void cliClient(){
         stdOut.println("CLI not implemented yet");
         System.exit(-1 /*ERR_NOT_IMPLEMENTED*/);
     }
     
     //GUI client implementation
+    /**
+     * Runs the GUI SMTP client
+     */
     private static void guiClient(){
         if(headless()){     //MUST be able to use GUIs in the first place...
             stdErr.println("Current environment does not support GUI!");
@@ -931,14 +1098,16 @@ public class SMTPClient{
         
         subject = (subject != null) ? subject : "";
         
+		//Open the connection...
         socket = openConnection(SMTP_SERVER_URL, SMTP_SERVER_PORT);
         Response resp = Response.getResponse(in);
         
-        if(resp.getResponseCode() != SMTP_READY){
+        if(resp.getResponseCode() != SMTP_READY){	//...if we're ready...
             stdErr.println("SMTP server not ready - " + resp.getResponseCode());
             System.exit(resp.getResponseCode());
         }
         
+		//Send & process EHLO
         logVerbose(EHLO + "localhost");
         out.println(EHLO + "localhost");
         
@@ -955,6 +1124,7 @@ public class SMTPClient{
         if(authMethod == null)
             getAuthMethod();
         
+		//Authenication
         buildAuthData();
         logVerbose(String.format("AUTH %s ****", authMethod));
         resp = submitAuthentication();
@@ -970,9 +1140,9 @@ public class SMTPClient{
             System.exit(resp.getResponseCode());
         }
         
+        //Check the recipients
         boolean atLeastOne = false;
         
-        //Check the recipients
         for(String recipient : recipients){
             logVerbose(String.format(RCPT, recipient));
             out.println(String.format(RCPT, recipient));
@@ -1014,6 +1184,7 @@ public class SMTPClient{
             System.exit(ERR_NO_RECIPIENTS);
         }
         
+		//All good! Time to enter the message
         logVerbose(DATA);
         out.println(DATA);
         resp = Response.getResponse(in);
@@ -1024,10 +1195,12 @@ public class SMTPClient{
             System.exit(resp.getResponseCode());
         }
         
+		//Server's ready for the message. Write the header (subject line)
         String subjectHeader = String.format("Subject:%s" + CRLF, subject);
         logVerbose(subjectHeader);
         out.println(subjectHeader);
         
+		//Message body
         for(String line : message){
             if(line.startsWith("."))
                 line = "." + line;  //Escape leading '.'
@@ -1036,6 +1209,7 @@ public class SMTPClient{
             out.println(line);
         }
         
+		//Terminate the message...
         logVerbose(".");
         out.println(".");
         resp = Response.getResponse(in);
@@ -1046,6 +1220,7 @@ public class SMTPClient{
             System.exit(resp.getResponseCode());
         }
         
+		//...and close the connection
         logVerbose(QUIT);
         out.println(QUIT);
         resp = Response.getResponse(in);
@@ -1053,7 +1228,11 @@ public class SMTPClient{
     }
     
     //File client
+    /**
+     * Runs the SMTP file based input client
+     */
     private static void fileClient(){
+		//Open the connection...
         socket = openConnection(SMTP_SERVER_URL, SMTP_SERVER_PORT);
         
         BufferedReader reader;
@@ -1065,6 +1244,7 @@ public class SMTPClient{
             System.exit(resp.getResponseCode());
         }
         
+		//Send & process EHLO
         logVerbose(EHLO + "localhost");
         out.println(EHLO + "localhost");
         
@@ -1081,6 +1261,7 @@ public class SMTPClient{
         if(authMethod == null)
             getAuthMethod();
         
+		//Authenication
         buildAuthData();
         logVerbose(String.format("AUTH %s ****", authMethod));
         resp = submitAuthentication();
@@ -1096,6 +1277,7 @@ public class SMTPClient{
             System.exit(resp.getResponseCode());
         }
         
+		//Check the recipients
         boolean atLeastOne = false;
         
         for(String recipient : recipients){
@@ -1139,6 +1321,7 @@ public class SMTPClient{
             System.exit(ERR_NO_RECIPIENTS);
         }
         
+		//All good! Time to enter the message
         logVerbose(DATA);
         out.println(DATA);
         resp = Response.getResponse(in);
@@ -1149,6 +1332,7 @@ public class SMTPClient{
             System.exit(resp.getResponseCode());
         }
         
+		//Server's ready for the message. Write the header (subject line)
         String line;
         
         try{
@@ -1173,6 +1357,7 @@ public class SMTPClient{
         }
         catch(IOException e){}
         
+		//Terminate the message...
         logVerbose(".");
         out.println(".");
         resp = Response.getResponse(in);
@@ -1183,17 +1368,27 @@ public class SMTPClient{
             System.exit(resp.getResponseCode());
         }
         
+		//...and close the connection
         logVerbose(QUIT);
         out.println(QUIT);
         resp = Response.getResponse(in);
         logVerbose(resp);
     }
     
+    /**@hidden*/
     private static boolean headless(){
         return java.awt.GraphicsEnvironment.isHeadless();
     }
     
     //Print a list of options to select from and return the chosen option
+    /**
+     * Promts the user with a multiple choices.
+     * 
+     * @param what What the user is chposing
+     * @param options The user's options
+     * @return The user's choice
+     * @see #yesNo
+     */
     private static String selectOption(String what, String... options){
         int n = options.length;
         
@@ -1216,11 +1411,21 @@ public class SMTPClient{
         
     }
     
-    //Container for server responses. Provides a static method to handle waiting for and reading responses.
+    /**
+     * Container for server responses. 
+     * <p>
+     * Provides a static method to handle waiting for and reading responses.
+     * 
+     *  @author     Riley Kuttruff
+     *  @version    1.0
+     */
     private static class Response implements Iterable<String>{
+        /**@hidden*/
         private int respCode, respType;
+        /**@hidden*/
         private List<String> respLines;
         
+        /**@hidden*/
         private static final Pattern RESP_NONFINAL, RESP_FINAL, SP;
         
         static{
@@ -1229,27 +1434,56 @@ public class SMTPClient{
             SP = Pattern.compile(" ");
         }
         
+        /**
+         * Default constructor.
+         */
         private Response(){
             respCode = respType = -1;
             respLines = new ArrayList<String>();
         }
         
+        /**
+         * Returns the response code from the server.
+         * 
+         * @return Server's response code
+         */
         public int getResponseCode(){
             return respCode;
         }
         
+        /**
+         * Returns the type of this response's response code.
+         * 
+         * @return Server's response code type (First digit)
+         */
         public int getResponseCodeType(){
             return respType;
         }
         
+        /**
+         * Lines of the response text.
+         * <p>
+         * Returned as an unmodifiable list.
+         * 
+         * @return {@link java.util.List} object containing the response text line-by-line.
+         * @see Collections##unmodifiableList(java.util.List)
+         */
         public List<String> getResponseLines(){
             return Collections.unmodifiableList(respLines);
         }
         
+        /**
+         * Print this response to standard output.
+         */
         public void print(){
             stdOut.println(this);
         }
         
+        /**
+         * Reconstructs the text of the server's response.
+         * 
+         * @return Response text
+         */
         @Override
         public String toString(){
             StringBuilder sb = new StringBuilder();
@@ -1260,6 +1494,13 @@ public class SMTPClient{
             return sb.toString().trim();
         }
         
+        /**
+         * Provides an iterator over the lines of the response text.
+         * <p>
+         * Iterator cannot be used to modify the response, {@code remove()} has no effect.
+         * 
+         * @return Iterator over the lines of the response text.
+         */
         @Override
         public Iterator<String> iterator(){
             Iterator<String> itr = getResponseLines().iterator();
@@ -1276,10 +1517,16 @@ public class SMTPClient{
                 }
                 
                 @Override
-                public void remove(){}
+                public void remove(){}	//Ignore this. Response should be immutable
             };
         }
         
+        /**
+         * Parses server response.
+         * 
+         * @param reader {@link BufferedReader} object around the server's output
+         * @return Parsed Response object
+         */
         public static Response getResponse(BufferedReader reader){
             Response resp = new Response();
             List<String> lines = resp.respLines;
@@ -1309,26 +1556,32 @@ public class SMTPClient{
             return resp;
         }
         
+		//Regex convenience methods
+		
+        /**@hidden*/
         private static boolean matches(CharSequence seq, Pattern p){
             return p.matcher(seq).matches();
         }
         
+        /**@hidden*/
         private static String[] split(Pattern p, CharSequence seq){
             return split(p, seq, 0);
         }
         
+        /**@hidden*/
         private static String[] split(Pattern p, CharSequence seq, int limit){
             return p.split(seq, limit);
         }
     }
 
+    /**@hidden*/
     //The help message...
     private static final String[] HELP_MSG = {
         "Usage:",
         "",
         "  java SMTPClient -type=raw|cli|gui [OPTIONS...]",
-        "  java SMTPClient -type=file [-v] -from=<usr gmail addr> \\",
-        "                  -to=<rcpt addr>[(;<rcpt addr>)*] [-pass=<usr passwd>] -- FILE...",
+        "  java SMTPClient -type=file [-v] [-from=<usr gmail addr>] \\",
+        "                  [-to=<rcpt addr>[(;<rcpt addr>)*]] [-pass=<usr passwd>] -- FILE...",
         "",
         "Options:",
         "",
@@ -1378,10 +1631,10 @@ public class SMTPClient{
         "  6  Bad command line",
         "  7  No valid recipient addresses",
         "  8  GUI requested but not supported by the runtime environment.",
-        "  9  Authenication info file (.auth) not found.",
-        "  10 Authenication info file (.auth) does not contain needed fields.",
-        "  11 Authenication subprocess failure.",
-        "  12 No valid authenication methods.",
+        "  9  Authentication info file (.env) not found.",
+        "  10 Authentication info file (.env) does not contain needed fields.",
+        "  11 Authentication subprocess failure.",
+        "  12 No valid authentication methods.",
         "",
         "  404  File not found. (for type=file)",
         "",

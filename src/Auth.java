@@ -10,10 +10,29 @@
 *
 */
 
+/**
+ *  Basic interface for SMTP authentication method implementations. PLAIN method is excluded for now as it is already implemented in {@Link SMTPClient}
+ *  <p>
+ *  Also contains AUTH-specific error codes.
+ *
+ *  @author     Riley Kuttruff
+ *  @version    1.0
+ */
 public interface Auth{
+    /**Error code: Needed authentication information file has not been found*/
     static final int ERR_AUTH_INFO_NOT_FOUND = 0x9;
+    /**Error code: Authentication information file is missing data needed for specified method.*/
     static final int ERR_AUTH_INFO_INCOMPLETE = 0xa;
+    /**Error code: Authentication child process failed.*/
     static final int ERR_AUTH_SUBPROC_FAILED = 0xb;
     
+    /**
+     * Produce authentication data.
+     * <p>
+     * Produces the data used as an argument to the AUTH SMTP command. In particular, it produces the string that follows {@code AUTH <METHOD> }.
+     * 
+     * @param user Username for authentication.
+     * @return The bytes of the argument to the AUTH command, just the authentication data, not the method name itself.
+     */
     public byte[] buildAuthString(String user);
 }

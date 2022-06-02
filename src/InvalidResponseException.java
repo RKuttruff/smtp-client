@@ -10,6 +10,12 @@
 *
 */
 
+/**
+ * SMTP exception for a malformed response from the server.
+ *
+ *  @author     Riley Kuttruff
+ *  @version    1.0
+ */
 public class InvalidResponseException extends SMTPException{
     public InvalidResponseException(){
         this(null);
