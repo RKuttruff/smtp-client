@@ -10,6 +10,189 @@
 *
 */
 
+/**
+ *  Interface for exit codes for use program wide
+ *  <p>
+ *  Contains two groups of constants: SMTP commands and SMTP server response codes.
+ *  
+ *  <h2>SMTP response codes</h3>
+ *  Response codes are described in <a href="https://datatracker.ietf.org/doc/html/rfc5321#section-4.2">RFC 5321, Section 4.2</a>
+ *  <h3>Leading digit</h3>
+ *  <table class="striped">
+ *  <thead>
+ *    <tr>
+ *      <th>Number</th>
+ *      <th>Description</th>
+ *    </tr>
+ *  </thead>
+ *  <tbody>
+ *    <tr>
+ *      <td style="text-align:right">2</td>
+ *      <td>Positive Completion</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">3</td>
+ *      <td>Positive Intermediate</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">4</td>
+ *      <td>Transient Negative Completion</td>
+ *    </tr>
+ *    <tr style="text-align:right">
+ *      <td>5</td>
+ *      <td>Permanent Negative Completion</td>
+ *    </tr>
+ *  </tbody>
+ *  </table>
+ *  <h3>Second digit</h3>
+ *  <table class="striped">
+ *  <thead>
+ *    <tr>
+ *      <th>Number</th>
+ *      <th>Description</th>
+ *    </tr>
+ *  </thead>
+ *  <tbody>
+ *    <tr>
+ *      <td style="text-align:right">0</td>
+ *      <td>Syntax: These replies refer to syntax errors, syntactically correct commands <br>that do not fit any functional category, and unimplemented or superfluous <br>commands.</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">1</td>
+ *      <td>Information: These are replies to requests for information, such as status or <br>help.</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">2</td>
+ *      <td>Connections: These are replies referring to the transmission channel.</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">3</td>
+ *      <td>Unspecified</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">4</td>
+ *      <td>Unspecified</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">5</td>
+ *      <td>Mail system: These replies indicate the status of the receiver mail system <br>vis-a-vis the requested transfer or other mail system action.</td>
+ *    </tr>
+ *  </tbody>
+ *  </table>
+ *  <h3>Specified codes</h3>
+ *  <table class="striped">
+ *  <thead>
+ *    <tr>
+ *      <th>Code</th>
+ *      <th>Description</th>
+ *    </tr>
+ *  </thead>
+ *  <tbody>
+ *    <tr>
+ *      <td style="text-align:right">211</td>
+ *      <td>System status, or system help reply</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">214</td>
+ *      <td>Help message (Information on how to use the receiver or the meaning of a <br>particular non-standard command; this reply is useful only to the human user)</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">220</td>
+ *      <td>&lt;domain&gt; Service ready</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">221</td>
+ *      <td>&lt;domain&gt; Service closing transmission channel</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">250</td>
+ *      <td>Requested mail action okay, completed</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">251</td>
+ *      <td>User not local; will forward to &lt;forward-path&gt; (See Section 3.4)</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">252</td>
+ *      <td>Cannot VRFY user, but will accept message and attempt delivery <br>(See Section 3.5.3)</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">354</td>
+ *      <td>Start mail input; end with &lt;CRLF&gt;.&lt;CRLF&gt;</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">421</td>
+ *      <td>&lt;domain&gt; Service not available, closing transmission channel (This may be <br>a reply to any command if the service knows it musts hut down)</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">450</td>
+ *      <td>Requested mail action not taken: mailbox unavailable (e.g., mailbox busy or <br>temporarily blocked for policy reasons)</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">451</td>
+ *      <td>Requested action aborted: local error in processing</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">452</td>
+ *      <td>Requested action not taken: insufficient system storage</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">455</td>
+ *      <td>Server unable to accommodate parameters</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">500</td>
+ *      <td>Syntax error, command unrecognized (This may include errors such as <br>command line too long)</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">501</td>
+ *      <td>Syntax error in parameters or arguments</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">502</td>
+ *      <td>Command not implemented (see Section 4.2.4)</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">503</td>
+ *      <td>Bad sequence of commands</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">504</td>
+ *      <td>Command parameter not implemented</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">550</td>
+ *      <td>Requested action not taken: mailbox unavailable (e.g., mailbox not found, <br>no access, or command rejected for policy reasons)</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">551</td>
+ *      <td>User not local; please try &lt;forward-path&gt; (See Section 3.4)</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">552</td>
+ *      <td>Requested mail action aborted: exceeded storage allocation</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">553</td>
+ *      <td>Requested action not taken: mailbox name not allowed (e.g., mailbox <br>syntax incorrect)</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">554</td>
+ *      <td>Transaction failed (Or, in the case of a connection-opening response, <br>"No SMTP service here")</td>
+ *    </tr>
+ *    <tr>
+ *      <td style="text-align:right">555</td>
+ *      <td>MAIL FROM/RCPT TO parameters not recognized or not implemented</td>
+ *    </tr>
+ *  </tbody>
+ *  </table>
+ *  
+ *  
+ *  
+ *  
+ *  @author     Riley Kuttruff
+ *  @version    1.0
+ */
 public interface SMTPConstants{
     /*      SMTP return code constants      */
     /*      Defined in RFC 5321 4.2.2-3     */
