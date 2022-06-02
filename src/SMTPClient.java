@@ -31,7 +31,7 @@ import javax.swing.JPanel;
  *  @author     Riley Kuttruff
  *  @version    1.0
  */
-public class SMTPClient{
+public class SMTPClient implements SMTPConstants, ExitCodes{
     /*      Basic constants     */
     /**SMTP uses Carriage return-line feed.*/
     private static final String CRLF = "\r\n";
