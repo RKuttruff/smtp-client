@@ -231,6 +231,7 @@ class GUIClient extends JFrame{
     public static ClientData getMessage(final ClientData data){
         SwingUtilities.invokeLater(() -> new GUIClient(data));
         
+		//Task to return the current thread. It is executed on the EDT and its result fetched by the main thread to join
         FutureTask<Thread> future = new FutureTask<>(new Callable<Thread>(){
             public Thread call(){
                 return Thread.currentThread();

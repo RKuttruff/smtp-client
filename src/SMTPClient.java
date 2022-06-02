@@ -270,6 +270,7 @@ public class SMTPClient{
         if(verbose)
             stdOut.print("Resolving hostname " + url + "...");
         
+		//Try to resolve hostname
         try{
             addresses = InetAddress.getAllByName(url);
         }
@@ -291,6 +292,8 @@ public class SMTPClient{
         
         SocketFactory factory = SSLSocketFactory.getDefault();
         
+		//Loop through the resolved addresses and try to connect on the given port
+		//Return on first success
         for(InetAddress addr : addresses){
             String addrString = inetAddressToHostString(addr);
             
@@ -765,7 +768,7 @@ public class SMTPClient{
                     if(!valid){
                         stdErr.println("Invalid auth method: " + am);
                         
-                        System.exit(ERR_INVALID_OPT);
+                        System.exit(ERR_BAD_COMMAND_LINE);
                     }
                     
                     authMethod = am;
@@ -885,6 +888,7 @@ public class SMTPClient{
         System.exit(ERR_OK);
     }
     
+	//Convenience method
     /**@hidden*/
     private static String readLine(BufferedReader reader){
         try{
@@ -934,7 +938,7 @@ public class SMTPClient{
                     b = true;
                 else if(resp.equalsIgnoreCase("n"))
                     b = false;
-            }while(b == null);
+            }while(b == null);	//Loop until user enters a valid input
         }
         catch(IOException e){
             return false;
@@ -954,9 +958,11 @@ public class SMTPClient{
         
         boolean autoEHLO, autoAUTH;
         
+		//Prompt user whether they want EHLO/AUTH commands to be sent
         autoEHLO = yesNo("Automatically send EHLO? ");
-        autoAUTH = yesNo("Automatically generate & submit authentication? ");
+        autoAUTH = autoEHLO ? yesNo("Automatically generate & submit authentication? ") : false;	//Don't auto sent AUTH if EHLO hasn't been sent & processed
         
+		//Open the connection...
         socket = openConnection(SMTP_SERVER_URL, SMTP_SERVER_PORT);
         
         Response resp = Response.getResponse(in);
@@ -970,8 +976,8 @@ public class SMTPClient{
         
         boolean msgBody = false;
         
-        for(;;){
-            if(autoEHLO){
+        for(;;){	//Main loop
+            if(autoEHLO){		//Send EHLO if user wants
                 inputString = EHLO + "localhost";
                 stdOut.println(inputString);
                 autoEHLO = false;
@@ -1003,11 +1009,13 @@ public class SMTPClient{
                 System.exit(ERR_IO_ERROR);
             }
             
+			//In the message body, terminate message body (resume waiting for responses) on single '.'
             if(msgBody && inputString.trim().equals("."))
                 msgBody = false;
             
-            out.println(inputString);
+            out.println(inputString);	//Send what the user types
             
+			//If we're in the message body, loop instead of waiting for the server to respond
             if(msgBody)
                 continue;   //Since server does not reply between DATA and ., skip getting the response
                             //since it will block forever trying to read from the socket
@@ -1015,11 +1023,11 @@ public class SMTPClient{
             resp = Response.getResponse(in);
             resp.print();
             
-            if(resp.getResponseCodeType() == 5){
+            if(resp.getResponseCodeType() == 5){	//Exit if an error occurs
                 stdErr.println("SMTP Error - " + resp.getResponseCode());
                 System.exit(resp.getResponseCode());
             }
-            else if(resp.getResponseCode() == SMTP_CLOSING){
+            else if(resp.getResponseCode() == SMTP_CLOSING){	//When we're done
                 if(verbose)
                     stdOut.println("Transaction complete - closing...");
                 
@@ -1037,7 +1045,7 @@ public class SMTPClient{
                 
                 System.exit(ERR_OK);
             }
-            else if(resp.getResponseCode() == SMTP_START_MAIL)
+            else if(resp.getResponseCode() == SMTP_START_MAIL)	//Start message body when the server is ready
                 msgBody = true;
         }
     }
@@ -1090,14 +1098,16 @@ public class SMTPClient{
         
         subject = (subject != null) ? subject : "";
         
+		//Open the connection...
         socket = openConnection(SMTP_SERVER_URL, SMTP_SERVER_PORT);
         Response resp = Response.getResponse(in);
         
-        if(resp.getResponseCode() != SMTP_READY){
+        if(resp.getResponseCode() != SMTP_READY){	//...if we're ready...
             stdErr.println("SMTP server not ready - " + resp.getResponseCode());
             System.exit(resp.getResponseCode());
         }
         
+		//Send & process EHLO
         logVerbose(EHLO + "localhost");
         out.println(EHLO + "localhost");
         
@@ -1114,6 +1124,7 @@ public class SMTPClient{
         if(authMethod == null)
             getAuthMethod();
         
+		//Authenication
         buildAuthData();
         logVerbose(String.format("AUTH %s ****", authMethod));
         resp = submitAuthentication();
@@ -1129,9 +1140,9 @@ public class SMTPClient{
             System.exit(resp.getResponseCode());
         }
         
+        //Check the recipients
         boolean atLeastOne = false;
         
-        //Check the recipients
         for(String recipient : recipients){
             logVerbose(String.format(RCPT, recipient));
             out.println(String.format(RCPT, recipient));
@@ -1173,6 +1184,7 @@ public class SMTPClient{
             System.exit(ERR_NO_RECIPIENTS);
         }
         
+		//All good! Time to enter the message
         logVerbose(DATA);
         out.println(DATA);
         resp = Response.getResponse(in);
@@ -1183,10 +1195,12 @@ public class SMTPClient{
             System.exit(resp.getResponseCode());
         }
         
+		//Server's ready for the message. Write the header (subject line)
         String subjectHeader = String.format("Subject:%s" + CRLF, subject);
         logVerbose(subjectHeader);
         out.println(subjectHeader);
         
+		//Message body
         for(String line : message){
             if(line.startsWith("."))
                 line = "." + line;  //Escape leading '.'
@@ -1195,6 +1209,7 @@ public class SMTPClient{
             out.println(line);
         }
         
+		//Terminate the message...
         logVerbose(".");
         out.println(".");
         resp = Response.getResponse(in);
@@ -1205,6 +1220,7 @@ public class SMTPClient{
             System.exit(resp.getResponseCode());
         }
         
+		//...and close the connection
         logVerbose(QUIT);
         out.println(QUIT);
         resp = Response.getResponse(in);
@@ -1216,6 +1232,7 @@ public class SMTPClient{
      * Runs the SMTP file based input client
      */
     private static void fileClient(){
+		//Open the connection...
         socket = openConnection(SMTP_SERVER_URL, SMTP_SERVER_PORT);
         
         BufferedReader reader;
@@ -1227,6 +1244,7 @@ public class SMTPClient{
             System.exit(resp.getResponseCode());
         }
         
+		//Send & process EHLO
         logVerbose(EHLO + "localhost");
         out.println(EHLO + "localhost");
         
@@ -1243,6 +1261,7 @@ public class SMTPClient{
         if(authMethod == null)
             getAuthMethod();
         
+		//Authenication
         buildAuthData();
         logVerbose(String.format("AUTH %s ****", authMethod));
         resp = submitAuthentication();
@@ -1258,6 +1277,7 @@ public class SMTPClient{
             System.exit(resp.getResponseCode());
         }
         
+		//Check the recipients
         boolean atLeastOne = false;
         
         for(String recipient : recipients){
@@ -1301,6 +1321,7 @@ public class SMTPClient{
             System.exit(ERR_NO_RECIPIENTS);
         }
         
+		//All good! Time to enter the message
         logVerbose(DATA);
         out.println(DATA);
         resp = Response.getResponse(in);
@@ -1311,6 +1332,7 @@ public class SMTPClient{
             System.exit(resp.getResponseCode());
         }
         
+		//Server's ready for the message. Write the header (subject line)
         String line;
         
         try{
@@ -1335,6 +1357,7 @@ public class SMTPClient{
         }
         catch(IOException e){}
         
+		//Terminate the message...
         logVerbose(".");
         out.println(".");
         resp = Response.getResponse(in);
@@ -1345,6 +1368,7 @@ public class SMTPClient{
             System.exit(resp.getResponseCode());
         }
         
+		//...and close the connection
         logVerbose(QUIT);
         out.println(QUIT);
         resp = Response.getResponse(in);
@@ -1387,7 +1411,6 @@ public class SMTPClient{
         
     }
     
-    //
     /**
      * Container for server responses. 
      * <p>
@@ -1494,7 +1517,7 @@ public class SMTPClient{
                 }
                 
                 @Override
-                public void remove(){}
+                public void remove(){}	//Ignore this. Response should be immutable
             };
         }
         
@@ -1533,6 +1556,8 @@ public class SMTPClient{
             return resp;
         }
         
+		//Regex convenience methods
+		
         /**@hidden*/
         private static boolean matches(CharSequence seq, Pattern p){
             return p.matcher(seq).matches();
