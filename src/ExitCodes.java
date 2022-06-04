@@ -10,6 +10,87 @@
 *
 */
 
+/**
+ *  Interface for exit codes for use program wide
+ *  <p>
+ *  <table class="striped">
+ * <thead>
+ *   <tr>
+ *     <th>Value</th>
+ *     <th>Description</th>
+ *   </tr>
+ * </thead>
+ * <tbody>
+ *   <tr>
+ *     <td style="text-align:right">0</td>
+ *     <td>OK</td>
+ *   </tr>
+ *   <tr>
+ *     <td style="text-align:right">1</td>
+ *     <td>Could not resolve SMTP host</td>
+ *   </tr>
+ *   <tr>
+ *     <td style="text-align:right">2</td>
+ *     <td>Could not connect to SMTP server</td>
+ *   </tr>
+ *   <tr>
+ *     <td style="text-align:right">3</td>
+ *     <td>IO error</td>
+ *   </tr>
+ *   <tr>
+ *     <td style="text-align:right">4</td>
+ *     <td>SMTP authentication failed</td>
+ *   </tr>
+ *   <tr>
+ *     <td style="text-align:right">5</td>
+ *     <td>Invalid command line option</td>
+ *   </tr>
+ *   <tr>
+ *     <td style="text-align:right">6</td>
+ *     <td>Bad command line</td>
+ *   </tr>
+ *   <tr>
+ *     <td style="text-align:right">7</td>
+ *     <td>No valid recipient addresses</td>
+ *   </tr>
+ *   <tr>
+ *     <td style="text-align:right">8</td>
+ *     <td>GUI requested but not supported by the runtime environment.</td>
+ *   </tr>
+ *   <tr>
+ *     <td style="text-align:right">9</td>
+ *     <td>Authentication info file (.env) not found.</td>
+ *   </tr>
+ *   <tr>
+ *     <td style="text-align:right">10</td>
+ *     <td>Authentication info file (.env) does not contain needed fields.</td>
+ *   </tr>
+ *   <tr>
+ *     <td style="text-align:right">11</td>
+ *     <td>Authentication subprocess failure.</td>
+ *   </tr>
+ *   <tr>
+ *     <td style="text-align:right">12</td>
+ *     <td>No valid authentication methods.</td>
+ *   </tr>
+ *   <tr>
+ *     <td style="text-align:right">404</td>
+ *     <td>File not found. (for type=file)</td>
+ *   </tr>
+ *   <tr>
+ *     <td style="text-align:right">-1</td>
+ *     <td>Feature not implemented</td>
+ *   </tr>
+ *   <tr>
+ *     <td style="text-align:right">Other</td>
+ *     <td>SMTP error code (4xx, 5xx)</td>
+ *   </tr>
+ * </tbody>
+ * </table>
+ *
+ *  @author     Riley Kuttruff
+ *  @version    1.0
+ */
 public interface ExitCodes{
     /*      Return codes        */
     /**Program exited normally, either mail was successfully sent or no mail sent but not due to errors.*/
