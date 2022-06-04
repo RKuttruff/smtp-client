@@ -59,6 +59,9 @@ def tryRefresh(clientId, clientSecret, refreshToken):
 		data = ret.json()
 		return (True, data)
 
+def convertIfNeeded(data):
+	pass
+
 def getToken():
 	CLIENT_ID = os.getenv('CLIENT_ID')
 	CLIENT_SECRET = os.getenv('CLIENT_SECRET')
