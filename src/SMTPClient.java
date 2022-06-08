@@ -900,7 +900,7 @@ public class SMTPClient implements SMTPConstants, ExitCodes{
                     getAuthMethod();
                 
                 buildAuthData();
-                logVerbose(String.format("AUTH %s ****", authMethod));
+                stdOut.println(String.format("AUTH %s ****", authMethod));
                 resp = submitAuthentication();
                 resp.print();
                 autoAUTH = false;
