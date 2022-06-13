@@ -90,15 +90,17 @@ def getToken():
 				
 				data['token_expiry'] = (datetime.now() + timedelta(seconds=exp)).isoformat()
 		
-		f.close()
-		
-		f = open(STORE, "w")
-		f.write(json.dumps(data))
-		f.close()
-		
-		print(data['access_token'])
-		sys.exit(0)
+				f.close()
+				
+				f = open(STORE, "w")
+				f.write(json.dumps(data))
+				f.close()
+				
+				print(data['access_token'])
+				sys.exit(0)
 	
+		f.close()
+		
 	o_stdout, o_file = disable_stout()
 	
 	flow = OAuth2WebServerFlow(client_id=CLIENT_ID, client_secret=CLIENT_SECRET, scope=SCOPE, redirect_uri=REDIRECT_URL)
