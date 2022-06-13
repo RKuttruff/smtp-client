@@ -31,6 +31,8 @@ load_dotenv()
 
 STORE = 'creds.data'
 
+username = os.getenv('username')
+
 def disable_stout():
 	o_stdout = sys.stdout
 	o_file = open(os.devnull, "w")
