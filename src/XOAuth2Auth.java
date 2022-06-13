@@ -127,6 +127,7 @@ public class XOAuth2Auth implements Auth, ExitCodes{
         String authToken = null;
         
         ProcessBuilder pb = new ProcessBuilder(getCmd()).redirectError(ProcessBuilder.Redirect.INHERIT);
+		pb.environment().put("username", user);
         
         try{
             Process p = pb.start();
