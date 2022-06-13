@@ -12,6 +12,8 @@
 
 # Based on https://gist.github.com/clarketm/dc5d5be390e3f811a2dd7f5e8c5728ba
 
+# pyinstaller -F auth.py
+
 import os,sys
 
 from os.path import exists
