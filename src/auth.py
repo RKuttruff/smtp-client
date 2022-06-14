@@ -32,6 +32,7 @@ from dateutil import parser
 load_dotenv()
 
 STORE = 'creds.data'
+NEWSTORE = 'creds.data.new'
 
 username = os.getenv('username')
 
@@ -64,7 +65,12 @@ def tryRefresh(clientId, clientSecret, refreshToken):
 		return (True, data)
 
 def convertIfNeeded(data):
-	pass
+	if 'username' not in data.keys():
+		newData = {}
+		newData[username] = data
+		return newData
+	else:
+		return data
 
 def getToken():
 	CLIENT_ID = os.getenv('CLIENT_ID')
@@ -109,11 +115,29 @@ def getToken():
 	
 	flow = OAuth2WebServerFlow(client_id=CLIENT_ID, client_secret=CLIENT_SECRET, scope=SCOPE, redirect_uri=REDIRECT_URL)
 	
-	storage = Storage(STORE)
+	storage = Storage(NEWSTORE)
 	credentials = run_flow(flow, storage)
 	enable_stout(o_stdout, o_file)
 	
 #	print ("access_token: %s" % (credentials.access_token))
 	print(credentials.access_token)
+	
+	s = open(STORE, "r")
+	ns = open(NEWSTORE, "r")
+	
+	data = json.load(s)
+	data = convertIfNeeded(data)
+	newData = json.load(ns)
+	
+	data[username] = newData
+	
+	ns.close()
+	s.close()
+	
+	os.remove(NEWSTORE)
+	
+	f = open(STORE, "w")
+	f.write(json.dumps(data))
+	f.close()
 	
 getToken()
