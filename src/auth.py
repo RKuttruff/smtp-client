@@ -31,9 +31,6 @@ from dateutil import parser
 
 load_dotenv()
 
-STORE = 'creds.data'
-NEWSTORE = 'creds.data.new'
-
 username = os.getenv('username')
 
 def disable_stout():
@@ -45,6 +42,13 @@ def disable_stout():
 def enable_stout(o_stdout, o_file):
 	o_file.close()
 	sys.stdout = o_stdout
+	
+# Returns paths for STORE & NEWSTORE
+def getStateFiles():
+	pass
+
+STORE = 'creds.data'
+NEWSTORE = 'creds.data.new'
 
 def tryRefresh(clientId, clientSecret, refreshToken):
 	url = 'https://oauth2.googleapis.com/token'
@@ -65,9 +69,12 @@ def tryRefresh(clientId, clientSecret, refreshToken):
 		return (True, data)
 
 def convertIfNeeded(data):
-	if 'username' not in data.keys():
+	if 'users' not in data.keys():
 		newData = {}
-		newData[username] = data
+		newData['users'] = [{
+			"username": username,
+			"data": data
+		}]
 		return newData
 	else:
 		return data
@@ -82,32 +89,42 @@ def getToken():
 	if exists(STORE):
 		f = open(STORE, "r")
 		
-		data = json.load(f)
+		creddata = json.load(f)
+		
+		data = None
+		
+		for d in creddata['users']:
+			if d['username'] == username:
+				data = d
+				break
 			
 		now = datetime.now().isoformat()
 		
-		if now < data['token_expiry']:
-			print(data['access_token'])
-			sys.exit(0)
-		else:
-			success, resp = tryRefresh(CLIENT_ID, CLIENT_SECRET, data['refresh_token'])
-			
-			if success:
-				at = resp['access_token']
-				exp = resp['expires_in']
-				
-				data['access_token'] = at
-				
-				data['token_expiry'] = (datetime.now() + timedelta(seconds=exp)).isoformat()
-		
-				f.close()
-				
-				f = open(STORE, "w")
-				f.write(json.dumps(data))
-				f.close()
-				
+		if data is not None:
+			if now < data['token_expiry']:
 				print(data['access_token'])
 				sys.exit(0)
+			else:
+				success, resp = tryRefresh(CLIENT_ID, CLIENT_SECRET, data['refresh_token'])
+				
+				if success:
+					at = resp['access_token']
+					exp = resp['expires_in']
+					
+					data['access_token'] = at
+					
+					data['token_expiry'] = (datetime.now() + timedelta(seconds=exp)).isoformat()
+			
+					f.close()
+					
+					f = open(STORE, "w")
+					f.write(json.dumps(data))
+					f.close()
+					
+					print(data['access_token'])
+					sys.exit(0)
+				else:
+					creddata['users'].remove(data)
 	
 		f.close()
 		
@@ -129,7 +146,7 @@ def getToken():
 	data = convertIfNeeded(data)
 	newData = json.load(ns)
 	
-	data[username] = newData
+	data['users'].append({"username": username, "data": newData})
 	
 	ns.close()
 	s.close()
