@@ -14,7 +14,7 @@
 
 # pyinstaller -F auth.py
 
-import os,sys
+import os, sys, platform
 
 from os.path import exists
 
@@ -43,12 +43,22 @@ def enable_stout(o_stdout, o_file):
 	o_file.close()
 	sys.stdout = o_stdout
 	
-# Returns paths for STORE & NEWSTORE
-def getStateFiles():
-	pass
+os_type = platform.system()
 
-STORE = 'creds.data'
-NEWSTORE = 'creds.data.new'
+STORE = None
+
+if os_type == 'Windows':
+	STORE = os.getenv("APPDATA") + '\\smtp-client\\creds.data'
+elif os_type == 'Linux' or os_type == 'Darwin':
+	STORE = '~/.smtpc/creds.data'
+else:
+	STORE = 'creds.data'
+
+if os.getenv('uselocalstate') is not None:
+	STORE = 'creds.data'
+
+# STORE = 'creds.data'
+NEWSTORE = STORE + '.new'
 
 def tryRefresh(clientId, clientSecret, refreshToken):
 	url = 'https://oauth2.googleapis.com/token'
