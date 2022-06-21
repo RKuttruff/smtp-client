@@ -50,7 +50,7 @@ STORE = None
 if os_type == 'Windows':
 	STORE = os.getenv("APPDATA") + '\\smtp-client\\creds.data'
 elif os_type == 'Linux' or os_type == 'Darwin':
-	STORE = '~/.smtpc/creds.data'
+	STORE = os.path.expanduser('~/.smtpc/creds.data')
 else:
 	STORE = 'creds.data'
 
@@ -81,10 +81,12 @@ def tryRefresh(clientId, clientSecret, refreshToken):
 def convertIfNeeded(data):
 	if 'users' not in data.keys():
 		newData = {}
-		newData['users'] = [{
-			"username": username,
-			"data": data
-		}]
+		# newData['users'] = [{
+			# "username": username,
+			# "data": data
+		# }]
+		
+		newData['users'] = []
 		return newData
 	else:
 		return data
@@ -105,7 +107,7 @@ def getToken():
 		
 		for d in creddata['users']:
 			if d['username'] == username:
-				data = d
+				data = d['data']
 				break
 			
 		now = datetime.now().isoformat()
@@ -142,6 +144,16 @@ def getToken():
 	
 	flow = OAuth2WebServerFlow(client_id=CLIENT_ID, client_secret=CLIENT_SECRET, scope=SCOPE, redirect_uri=REDIRECT_URL)
 	
+	#ensure cred files exist
+	if not exists(STORE):
+		f = open(STORE, 'w')
+		f.write('{}')
+		f.close()
+
+	with open(NEWSTORE, 'a'):
+		pass
+
+	
 	storage = Storage(NEWSTORE)
 	credentials = run_flow(flow, storage)
 	enable_stout(o_stdout, o_file)
@@ -167,4 +179,5 @@ def getToken():
 	f.write(json.dumps(data))
 	f.close()
 	
+
 getToken()
