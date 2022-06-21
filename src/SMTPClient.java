@@ -75,6 +75,8 @@ public class SMTPClient implements SMTPConstants, ExitCodes{
     private static int type;        //-type=(cli)|(gui)|(raw)|(file) ; If -type=file, files are added in cmdline after --, requires from to and pass to be set
     /**Provide verbose output*/
     private static boolean verbose; //-v
+    /**Use auth state file in local directory*/
+    private static boolean useLocalAuth; //--use-local-auth
     /**Is standard input is being used for mail data input*/
     private static boolean pipe;
     
@@ -108,6 +110,7 @@ public class SMTPClient implements SMTPConstants, ExitCodes{
         stdErr = System.err;    
         
         verbose = false;
+		useLocalAuth = false;
         pipe = false;
         type = TYPE_DEFAULT;
         
@@ -312,7 +315,7 @@ public class SMTPClient implements SMTPConstants, ExitCodes{
      * Stores in {@link #authData}.
      */
     private static void getXOAuth2Data(){
-        Auth auth = new XOAuth2Auth();
+        Auth auth = new XOAuth2Auth(useLocalAuth);
         
         if(uName == null)
             getUser();
@@ -593,6 +596,9 @@ public class SMTPClient implements SMTPConstants, ExitCodes{
                 if(arg.equalsIgnoreCase("v")){
                     verbose = true;
                 }
+				else if(arg.equalsIgnoreCase("-use-local-auth")){
+					useLocalAuth = true;
+				}
                 else if(arg.startsWith("from=")){
                     if(userSet){
                         stdErr.println("Repeated argument: " + originalArg);
