@@ -25,6 +25,9 @@ public class XOAuth2Auth implements Auth, ExitCodes{
     private static final String[] INT_CMD = {"python3", "auth.py"};
     /**Subprocess command for when a Python interpreter is not available in the PATH.*/
     private static final String[] EXE_CMD = {"auth.exe"};
+	
+	/**Use auth state file in local directory*/
+    private boolean localState;
     
     /**
      * Determines the command to use for XOAUTH2 subprocess.
@@ -127,6 +130,10 @@ public class XOAuth2Auth implements Auth, ExitCodes{
         String authToken = null;
         
         ProcessBuilder pb = new ProcessBuilder(getCmd()).redirectError(ProcessBuilder.Redirect.INHERIT);
+		pb.environment().put("username", user);
+		
+		if(localState)
+			pb.environment().put("uselocalstate", "");
         
         try{
             Process p = pb.start();
@@ -160,10 +167,12 @@ public class XOAuth2Auth implements Auth, ExitCodes{
     }
     
     /** Default constructor, just validates the {@code .env} file */
-    public XOAuth2Auth(){
+    public XOAuth2Auth(boolean local){
         if(!verifyEnvFile()){
             System.err.println("Auth info file is missing needed fields. See README for info");
             System.exit(ERR_AUTH_INFO_INCOMPLETE);
         }
+		
+		localState = local;
     }
 }
